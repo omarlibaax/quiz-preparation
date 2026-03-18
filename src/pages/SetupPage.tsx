@@ -73,8 +73,8 @@ export default function SetupPage() {
         <div className="w-10" />
       </header>
 
-      <div className="overflow-hidden rounded-[2.2rem] bg-white/70 shadow-sm ring-1 ring-slate-200/70">
-        <div className="bg-gradient-to-r from-violet-600 to-indigo-600 px-6 py-6 text-white">
+      <div className="overflow-hidden rounded-3xl bg-white/80 shadow-sm ring-1 ring-slate-200/80">
+        <div className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 px-6 py-6 text-white">
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-90">
             {subjectName || 'Subject'}
           </p>
@@ -84,12 +84,12 @@ export default function SetupPage() {
           </p>
         </div>
 
-        <div className="space-y-4 p-5 md:p-9">
+        <div className="space-y-4 p-5 sm:p-6 md:p-7">
 
           <div className="mt-5 space-y-4">
 
           {canPickTopic ? (
-            <div className="rounded-2xl bg-white p-4">
+            <div className="rounded-3xl bg-white p-5">
               <label className="text-sm font-semibold text-slate-700">Sub-category (Topic)</label>
               <div className="mt-2 flex flex-wrap gap-2">
                 <button
@@ -123,7 +123,7 @@ export default function SetupPage() {
             </div>
           ) : null}
 
-          <div className="rounded-2xl bg-white p-4">
+          <div className="rounded-3xl bg-white p-5">
             <label className="text-sm font-semibold text-slate-700">Mode</label>
             <div className="mt-2 grid grid-cols-3 gap-2">
               {(['timed', 'practice', 'adaptive'] as const).map((m) => (
@@ -142,7 +142,7 @@ export default function SetupPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white p-4">
+          <div className="rounded-3xl bg-white p-5">
             <label className="text-sm font-semibold text-slate-700">Number of questions</label>
             <div className="mt-2 flex items-center gap-3">
               <input
@@ -158,7 +158,7 @@ export default function SetupPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white p-4">
+          <div className="rounded-3xl bg-white p-5">
             <label className="text-sm font-semibold text-slate-700">Difficulty</label>
             <div className="mt-2 grid grid-cols-4 gap-2">
               {(['mixed', 'easy', 'medium', 'hard'] as const).map((d) => (
@@ -177,7 +177,7 @@ export default function SetupPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-slate-50 p-4">
+          <div className="rounded-3xl bg-slate-50 p-5">
             <label className="text-sm font-semibold text-slate-700">Question type</label>
             <div className="mt-2 grid grid-cols-3 gap-2">
               {(['mixed', 'mcq', 'tf'] as const).map((t) => (
@@ -196,7 +196,7 @@ export default function SetupPage() {
             </div>
           </div>
 
-          <div className={`rounded-2xl bg-white p-4 ${mode === 'practice' ? 'opacity-50' : ''}`}>
+          <div className={`rounded-3xl bg-white p-5 ${mode === 'practice' ? 'opacity-50' : ''}`}>
             <label className="text-sm font-semibold text-slate-700">Time limit</label>
             <div className="mt-2 grid grid-cols-3 gap-2">
               {[5, 10, 20].map((m) => (
@@ -222,7 +222,7 @@ export default function SetupPage() {
             onClick={start}
             disabled={!canStart}
             className={[
-              'mt-4 w-full rounded-2xl px-5 py-4 text-base font-bold shadow-sm transition',
+              'mt-4 w-full rounded-3xl px-6 py-5 text-base font-bold shadow-sm transition',
               canStart
                 ? 'bg-sky-500 text-white hover:bg-sky-600'
                 : 'bg-slate-200 text-slate-500 cursor-not-allowed',

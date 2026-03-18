@@ -30,7 +30,7 @@ export default function ResultPage() {
   if (!attempt || !summary) {
     return (
       <div className="mx-auto w-full max-w-3xl px-4 py-10">
-        <div className="rounded-[2rem] bg-white p-6 shadow-xl ring-1 ring-slate-100/70">
+        <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-100/70">
           No attempt found. Please start a quiz again.
         </div>
       </div>
@@ -43,7 +43,7 @@ export default function ResultPage() {
   return (
     <div className="flex-1 px-1 sm:px-4">
       <div className="mx-auto w-full max-w-3xl py-5 sm:py-6">
-        <div className="rounded-[2rem] bg-white p-4 sm:p-5 shadow-xl ring-1 ring-slate-100/70">
+        <div className="rounded-3xl bg-white p-4 sm:p-5 shadow-sm ring-1 ring-slate-100/70">
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -57,7 +57,7 @@ export default function ResultPage() {
             </div>
 
             <div className="text-right">
-              <div className="rounded-[2rem] bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-4 text-white shadow-sm">
+              <div className="rounded-3xl bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-4 text-white shadow-sm">
                 <div className="text-xs font-semibold uppercase tracking-wide opacity-80">Score</div>
                 <div className="mt-1 text-3xl font-extrabold">{attempt.score.percent}%</div>
                 <div className="mt-1 text-xs font-semibold opacity-90">
@@ -119,14 +119,14 @@ export default function ResultPage() {
             <button
               type="button"
               onClick={() => navigate('/review')}
-              className="flex-1 rounded-[2rem] bg-slate-900 px-4 py-3 text-sm font-extrabold text-white shadow-sm transition hover:bg-slate-800"
+              className="flex-1 rounded-3xl bg-slate-900 px-4 py-3 text-sm font-extrabold text-white shadow-sm transition hover:bg-slate-800"
             >
               Review Answers
             </button>
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="rounded-[2rem] bg-white px-4 py-3 text-sm font-extrabold text-slate-800 ring-1 ring-slate-200 transition hover:bg-slate-50"
+              className="rounded-3xl bg-white px-4 py-3 text-sm font-extrabold text-slate-800 ring-1 ring-slate-200 transition hover:bg-slate-50"
             >
               Home
             </button>

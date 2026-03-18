@@ -5,6 +5,14 @@ import SubjectIcon from '../components/SubjectIcon'
 export default function HomePage() {
   const subjects = listSubjects()
 
+  const tileAccents = [
+    { bg: 'bg-indigo-50', text: 'text-indigo-700', ring: 'ring-indigo-200' },
+    { bg: 'bg-orange-50', text: 'text-orange-700', ring: 'ring-orange-200' },
+    { bg: 'bg-emerald-50', text: 'text-emerald-700', ring: 'ring-emerald-200' },
+    { bg: 'bg-violet-50', text: 'text-violet-700', ring: 'ring-violet-200' },
+    { bg: 'bg-rose-50', text: 'text-rose-700', ring: 'ring-rose-200' },
+  ]
+
   return (
     <div className="flex-1 p-4 sm:p-6">
       <div className="flex items-center justify-between gap-3">
@@ -47,37 +55,37 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {subjects.map((s, idx) => (
-            <Link
-              key={s.name}
-              to={`/setup?subject=${encodeURIComponent(s.name)}`}
-              className={[
-                'flex h-32 flex-col justify-between rounded-[1.8rem] p-5 text-white shadow-sm transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg',
-                idx % 5 === 0
-                  ? 'bg-[#3B82F6]'
-                  : idx % 5 === 1
-                  ? 'bg-[#F97316]'
-                  : idx % 5 === 2
-                  ? 'bg-[#22C55E]'
-                  : idx % 5 === 3
-                  ? 'bg-[#A855F7]'
-                  : 'bg-[#EF4444]',
-              ].join(' ')}
-            >
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-semibold opacity-90">Subject</div>
-                <div className="text-white opacity-90">
-                  <SubjectIcon subjectName={s.name} />
+          {subjects.map((s, idx) => {
+            const acc = tileAccents[idx % tileAccents.length]
+            return (
+              <Link
+                key={s.name}
+                to={`/setup?subject=${encodeURIComponent(s.name)}`}
+                className="group flex h-32 flex-col justify-between rounded-[1.8rem] border border-slate-200 bg-white/70 p-5 shadow-sm transition-all duration-300 hover:-translate-y-[2px] hover:bg-white hover:shadow-md"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-sm font-semibold text-slate-600">Subject</div>
+                  <div
+                    className={[
+                      'flex h-12 w-12 items-center justify-center rounded-2xl ring-1',
+                      acc.bg,
+                      acc.ring,
+                      acc.text,
+                    ].join(' ')}
+                  >
+                    <SubjectIcon subjectName={s.name} className="h-10 w-10" />
+                  </div>
                 </div>
-              </div>
-              <div className="leading-tight">
-                <div className="text-lg font-extrabold">{s.name}</div>
-                <div className="mt-1 text-[12px] text-sky-50/90 sm:text-[13px]">
-                  {s.topics.length} topic{s.topics.length !== 1 ? 's' : ''}
+
+                <div className="leading-tight">
+                  <div className="text-lg font-extrabold text-slate-900">{s.name}</div>
+                  <div className="mt-1 text-[12px] text-slate-600 sm:text-[13px]">
+                    {s.topics.length} topic{s.topics.length !== 1 ? 's' : ''}
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            )
+          })}
         </div>
       </section>
 

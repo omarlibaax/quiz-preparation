@@ -253,7 +253,7 @@ export default function QuizPage() {
   return (
     <div className="flex-1 px-2 sm:px-5">
       <div className="mx-auto w-full max-w-3xl py-7 sm:py-8">
-        <div className="rounded-[2.2rem] bg-white p-5 sm:p-6 shadow-xl ring-1 ring-slate-100/80">
+        <div className="rounded-3xl bg-white p-5 sm:p-6 shadow-sm ring-1 ring-slate-100/90">
           <div className="mb-4 flex items-start justify-between gap-3">
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -268,7 +268,7 @@ export default function QuizPage() {
             </div>
             <div className="text-right">
               {timeLimitSeconds != null && (
-                <div className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-bold text-white">
+                <div className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600/10 px-4 py-2 text-sm font-bold text-indigo-700 ring-1 ring-indigo-200">
                   <svg
                     viewBox="0 0 24 24"
                     className="h-5 w-5"
@@ -412,7 +412,7 @@ export default function QuizPage() {
                     onClick={() => goToIndex(i)}
                     className={[
                       'h-10 w-10 rounded-[1.6rem] text-base font-bold ring-1 transition',
-                      isActive ? 'bg-slate-900 text-white ring-slate-900' : '',
+                      isActive ? 'bg-indigo-600 text-white ring-indigo-600' : '',
                       answered ? 'bg-emerald-600 text-white ring-emerald-600' : '',
                       review && !answered ? 'bg-[#A855F7] text-white ring-[#A855F7]' : '',
                       !isGenerated ? 'cursor-not-allowed bg-slate-100 text-slate-400 ring-slate-200 opacity-70' : 'bg-white text-slate-700 ring-slate-200 hover:bg-slate-50',
