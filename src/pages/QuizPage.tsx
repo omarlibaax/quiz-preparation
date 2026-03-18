@@ -251,9 +251,9 @@ export default function QuizPage() {
   const { correct, wrong, skipped } = countCorrectWrongSkipped(questions, answersById)
 
   return (
-    <div className="flex-1 px-4">
-      <div className="mx-auto w-full max-w-3xl py-6">
-        <div className="rounded-3xl bg-white p-5 shadow-md ring-1 ring-slate-100">
+    <div className="flex-1 px-1 sm:px-4">
+      <div className="mx-auto w-full max-w-3xl py-5 sm:py-6">
+        <div className="rounded-[2rem] bg-white p-4 sm:p-5 shadow-xl ring-1 ring-slate-100/80">
           <div className="mb-4 flex items-start justify-between gap-3">
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -306,8 +306,10 @@ export default function QuizPage() {
                     type="button"
                     onClick={() => setAnswer(opt)}
                     className={[
-                      'rounded-2xl px-4 py-3 text-left text-sm font-semibold ring-1 transition',
-                      selected ? 'bg-indigo-600 text-white ring-indigo-600' : 'bg-white text-slate-800 ring-slate-200 hover:bg-slate-50',
+                      'rounded-2xl px-4 py-3 text-left text-sm font-semibold ring-1 transition-all duration-200',
+                      selected
+                        ? 'bg-indigo-600 text-white ring-indigo-600 shadow-sm'
+                        : 'bg-white text-slate-800 ring-slate-200 hover:bg-slate-50 hover:shadow-sm',
                     ].join(' ')}
                   >
                     {opt}
@@ -325,8 +327,10 @@ export default function QuizPage() {
                     type="button"
                     onClick={() => setAnswer(v)}
                     className={[
-                      'rounded-2xl px-4 py-3 text-sm font-bold ring-1 transition',
-                      selected ? 'bg-emerald-600 text-white ring-emerald-600' : 'bg-white text-slate-800 ring-slate-200 hover:bg-slate-50',
+                      'rounded-2xl px-4 py-3 text-sm font-bold ring-1 transition-all duration-200',
+                      selected
+                        ? 'bg-emerald-600 text-white ring-emerald-600 shadow-sm'
+                        : 'bg-white text-slate-800 ring-slate-200 hover:bg-slate-50 hover:shadow-sm',
                     ].join(' ')}
                   >
                     {v ? 'True' : 'False'}

@@ -76,19 +76,17 @@ export default function SetupPage() {
   }
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 p-3 sm:p-4">
       <header className="mb-4 flex items-center justify-between">
-        <Link to="/" className="text-xs font-semibold text-slate-500">
+        <Link to="/" className="text-xs font-semibold text-slate-500 hover:text-slate-800 transition">
           ← Back
         </Link>
-        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-          Configure
-        </div>
+        <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Setup</div>
         <div className="w-10" />
       </header>
 
-      <div className="overflow-hidden rounded-3xl bg-slate-50 shadow-md ring-1 ring-slate-100">
-        <div className="bg-gradient-to-r from-sky-500 to-indigo-500 px-5 py-4 text-white">
+      <div className="overflow-hidden rounded-[2rem] bg-white/70 shadow-sm ring-1 ring-slate-200/70">
+        <div className="bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-5 text-white">
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-90">
             {subjectName || 'Subject'}
           </p>
