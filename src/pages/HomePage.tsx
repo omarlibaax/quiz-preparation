@@ -24,7 +24,7 @@ export default function HomePage() {
           <span className="text-[11px] text-slate-400">{subjects.length} available</span>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 pb-2 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 pb-2 sm:grid-cols-3 lg:grid-cols-4">
           {subjects.map((s, idx) => (
             <Link
               key={s.name}

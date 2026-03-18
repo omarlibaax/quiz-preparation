@@ -74,7 +74,7 @@ export default function SetupPage() {
           </p>
         </div>
 
-        <div className="space-y-4 p-5">
+        <div className="space-y-4 p-5 md:p-8">
 
         <div className="mt-5 space-y-4">
           <div className="rounded-2xl bg-white p-3">
