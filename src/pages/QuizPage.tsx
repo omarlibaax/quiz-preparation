@@ -251,15 +251,15 @@ export default function QuizPage() {
   const { correct, wrong, skipped } = countCorrectWrongSkipped(questions, answersById)
 
   return (
-    <div className="flex-1 px-1 sm:px-4">
-      <div className="mx-auto w-full max-w-3xl py-5 sm:py-6">
-        <div className="rounded-[2rem] bg-white p-4 sm:p-5 shadow-xl ring-1 ring-slate-100/80">
+    <div className="flex-1 px-2 sm:px-5">
+      <div className="mx-auto w-full max-w-3xl py-7 sm:py-8">
+        <div className="rounded-[2.2rem] bg-white p-5 sm:p-6 shadow-xl ring-1 ring-slate-100/80">
           <div className="mb-4 flex items-start justify-between gap-3">
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                 {setup.subjectName}
               </div>
-              <div className="mt-1 text-lg font-extrabold text-slate-900">
+              <div className="mt-1 text-xl font-extrabold text-slate-900 sm:text-2xl">
                 Question {currentIndex + 1}
                 <span className="ml-2 text-sm font-semibold text-slate-500">
                   of {totalQuestions}
@@ -268,10 +268,10 @@ export default function QuizPage() {
             </div>
             <div className="text-right">
               {timeLimitSeconds != null && (
-                <div className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-3 py-2 text-xs font-bold text-white">
+                <div className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-bold text-white">
                   <svg
                     viewBox="0 0 24 24"
-                    className="h-4 w-4"
+                    className="h-5 w-5"
                     aria-hidden="true"
                     fill="none"
                   >
@@ -287,7 +287,7 @@ export default function QuizPage() {
                   {formatTime(timeLeftSeconds ?? 0)}
                 </div>
               )}
-              <div className="mt-2 text-xs text-slate-500">
+              <div className="mt-2 text-sm text-slate-500">
                 Correct: {correct} • Wrong: {wrong} • Skipped: {skipped}
               </div>
             </div>
@@ -300,11 +300,11 @@ export default function QuizPage() {
           </div>
 
           <div className="mb-4">
-            <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-100">
+            <div className="rounded-[1.8rem] bg-slate-50 p-5 ring-1 ring-slate-100">
               <div className="text-xs font-semibold text-slate-500">
                 Topic: {currentQuestion.topicName}
               </div>
-              <div className="mt-2 text-base font-bold text-slate-900">
+              <div className="mt-2 text-lg font-extrabold text-slate-900">
                 {currentQuestion.question}
               </div>
             </div>
@@ -320,7 +320,7 @@ export default function QuizPage() {
                     type="button"
                     onClick={() => setAnswer(opt)}
                     className={[
-                      'rounded-2xl px-4 py-3 text-left text-sm font-semibold ring-1 transition-all duration-200',
+                      'rounded-[1.6rem] px-5 py-4 text-left text-base font-semibold ring-1 transition-all duration-200',
                       selected
                         ? 'bg-indigo-600 text-white ring-indigo-600 shadow-sm'
                         : 'bg-white text-slate-800 ring-slate-200 hover:bg-slate-50 hover:shadow-sm',
@@ -341,7 +341,7 @@ export default function QuizPage() {
                     type="button"
                     onClick={() => setAnswer(v)}
                     className={[
-                      'rounded-2xl px-4 py-3 text-sm font-bold ring-1 transition-all duration-200',
+                        'rounded-[1.6rem] px-5 py-4 text-base font-bold ring-1 transition-all duration-200',
                       selected
                         ? 'bg-emerald-600 text-white ring-emerald-600 shadow-sm'
                         : 'bg-white text-slate-800 ring-slate-200 hover:bg-slate-50 hover:shadow-sm',
@@ -359,7 +359,7 @@ export default function QuizPage() {
               type="button"
               onClick={goPrev}
               disabled={currentIndex === 0}
-              className="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 disabled:opacity-50"
+              className="rounded-[1.6rem] bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 disabled:opacity-50"
             >
               Previous
             </button>
@@ -368,7 +368,7 @@ export default function QuizPage() {
               type="button"
               onClick={toggleReview}
               className={[
-                'rounded-2xl px-4 py-2 text-sm font-semibold ring-1 transition',
+                'rounded-[1.6rem] px-5 py-3 text-sm font-semibold ring-1 transition',
                 markedForReview[currentQuestion.id]
                   ? 'bg-[#A855F7] text-white ring-[#A855F7]'
                   : 'bg-white text-slate-700 ring-slate-200 hover:bg-slate-50',
@@ -384,7 +384,7 @@ export default function QuizPage() {
                 if (setup.mode !== 'adaptive' && isLast) submit('finished')
                 else goNext()
               }}
-              className="rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-500 px-5 py-2 text-sm font-extrabold text-white shadow-sm"
+              className="rounded-[1.6rem] bg-gradient-to-r from-sky-500 to-indigo-500 px-6 py-3 text-base font-extrabold text-white shadow-sm"
             >
               {setup.mode === 'adaptive' ? (currentIndex >= totalQuestions - 1 ? 'Submit' : 'Next') : currentIndex >= questions.length - 1 ? 'Submit' : 'Next'}
             </button>
@@ -411,7 +411,7 @@ export default function QuizPage() {
                     disabled={!isGenerated}
                     onClick={() => goToIndex(i)}
                     className={[
-                      'h-9 w-9 rounded-2xl text-sm font-bold ring-1 transition',
+                      'h-10 w-10 rounded-[1.6rem] text-base font-bold ring-1 transition',
                       isActive ? 'bg-slate-900 text-white ring-slate-900' : '',
                       answered ? 'bg-emerald-600 text-white ring-emerald-600' : '',
                       review && !answered ? 'bg-[#A855F7] text-white ring-[#A855F7]' : '',

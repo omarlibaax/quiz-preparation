@@ -6,22 +6,38 @@ export default function HomePage() {
   const subjects = listSubjects()
 
   return (
-    <div className="flex-1 p-3 sm:p-4">
+    <div className="flex-1 p-4 sm:p-6">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-sm">
-            <span className="text-2xl font-extrabold">?</span>
+          <div className="flex h-16 w-16 items-center justify-center rounded-[1.3rem] bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-sm">
+            <svg viewBox="0 0 24 24" className="h-10 w-10" aria-hidden="true" fill="none">
+              <path
+                d="M9.1 9a3 3 0 1 1 4.8 2.4c-.9.7-1.4 1.2-1.4 2.6"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+              />
+              <circle cx="12" cy="17.5" r="1" fill="currentColor" />
+              <path
+                d="M4.5 12a7.5 7.5 0 1 0 15 0a7.5 7.5 0 1 0 -15 0"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+              />
+            </svg>
           </div>
           <div>
             <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">QuizTime</div>
-            <h1 className="mt-0.5 text-2xl font-extrabold tracking-tight text-slate-900">Quiz Time</h1>
-            <p className="text-xs text-slate-500">Choose a category to begin</p>
+            <h1 className="mt-0.5 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+              Quiz Time
+            </h1>
+            <p className="text-sm text-slate-500 sm:text-base">Choose a category to begin</p>
           </div>
         </div>
       </div>
 
       <section className="mt-4 space-y-4">
-        <div className="rounded-[1.5rem] bg-white/70 p-3 shadow-sm ring-1 ring-slate-200/70">
+        <div className="rounded-[1.8rem] bg-white/70 p-4 shadow-sm ring-1 ring-slate-200/70">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Choose a category</h2>
@@ -30,13 +46,13 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {subjects.map((s, idx) => (
             <Link
               key={s.name}
               to={`/setup?subject=${encodeURIComponent(s.name)}`}
               className={[
-                'flex h-28 flex-col justify-between rounded-[1.5rem] p-4 text-white shadow-sm transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg',
+                'flex h-32 flex-col justify-between rounded-[1.8rem] p-5 text-white shadow-sm transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg',
                 idx % 5 === 0
                   ? 'bg-[#3B82F6]'
                   : idx % 5 === 1
@@ -49,14 +65,14 @@ export default function HomePage() {
               ].join(' ')}
             >
               <div className="flex items-center justify-between">
-                <div className="text-xs font-semibold opacity-90">Subject</div>
+                <div className="text-sm font-semibold opacity-90">Subject</div>
                 <div className="text-white opacity-90">
                   <SubjectIcon subjectName={s.name} />
                 </div>
               </div>
               <div className="leading-tight">
-                <div className="text-base font-extrabold">{s.name}</div>
-                <div className="mt-1 text-[11px] text-sky-50/90">
+                <div className="text-lg font-extrabold">{s.name}</div>
+                <div className="mt-1 text-[12px] text-sky-50/90 sm:text-[13px]">
                   {s.topics.length} topic{s.topics.length !== 1 ? 's' : ''}
                 </div>
               </div>

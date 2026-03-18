@@ -64,7 +64,7 @@ export default function SetupPage() {
   }
 
   return (
-    <div className="flex-1 p-3 sm:p-4">
+    <div className="flex-1 p-4 sm:p-6">
       <header className="mb-4 flex items-center justify-between">
         <Link to="/" className="text-xs font-semibold text-slate-500 hover:text-slate-800 transition">
           ← Back
@@ -73,23 +73,23 @@ export default function SetupPage() {
         <div className="w-10" />
       </header>
 
-      <div className="overflow-hidden rounded-[2rem] bg-white/70 shadow-sm ring-1 ring-slate-200/70">
-        <div className="bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-5 text-white">
+      <div className="overflow-hidden rounded-[2.2rem] bg-white/70 shadow-sm ring-1 ring-slate-200/70">
+        <div className="bg-gradient-to-r from-violet-600 to-indigo-600 px-6 py-6 text-white">
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-90">
             {subjectName || 'Subject'}
           </p>
-          <h1 className="mt-1 text-lg font-bold">Select your difficulty & mode</h1>
+          <h1 className="mt-1 text-xl font-bold sm:text-2xl">Select your difficulty & mode</h1>
           <p className="mt-1 text-[11px] text-sky-100">
             Tune the quiz to match your preparation level.
           </p>
         </div>
 
-        <div className="space-y-4 p-5 md:p-8">
+        <div className="space-y-4 p-5 md:p-9">
 
           <div className="mt-5 space-y-4">
 
           {canPickTopic ? (
-            <div className="rounded-2xl bg-white p-3">
+            <div className="rounded-2xl bg-white p-4">
               <label className="text-sm font-semibold text-slate-700">Sub-category (Topic)</label>
               <div className="mt-2 flex flex-wrap gap-2">
                 <button
@@ -123,7 +123,7 @@ export default function SetupPage() {
             </div>
           ) : null}
 
-          <div className="rounded-2xl bg-white p-3">
+          <div className="rounded-2xl bg-white p-4">
             <label className="text-sm font-semibold text-slate-700">Mode</label>
             <div className="mt-2 grid grid-cols-3 gap-2">
               {(['timed', 'practice', 'adaptive'] as const).map((m) => (
@@ -142,7 +142,7 @@ export default function SetupPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white p-3">
+          <div className="rounded-2xl bg-white p-4">
             <label className="text-sm font-semibold text-slate-700">Number of questions</label>
             <div className="mt-2 flex items-center gap-3">
               <input
@@ -158,7 +158,7 @@ export default function SetupPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white p-3">
+          <div className="rounded-2xl bg-white p-4">
             <label className="text-sm font-semibold text-slate-700">Difficulty</label>
             <div className="mt-2 grid grid-cols-4 gap-2">
               {(['mixed', 'easy', 'medium', 'hard'] as const).map((d) => (
@@ -177,7 +177,7 @@ export default function SetupPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-slate-50 p-3">
+          <div className="rounded-2xl bg-slate-50 p-4">
             <label className="text-sm font-semibold text-slate-700">Question type</label>
             <div className="mt-2 grid grid-cols-3 gap-2">
               {(['mixed', 'mcq', 'tf'] as const).map((t) => (
@@ -196,7 +196,7 @@ export default function SetupPage() {
             </div>
           </div>
 
-          <div className={`rounded-2xl bg-white p-3 ${mode === 'practice' ? 'opacity-50' : ''}`}>
+          <div className={`rounded-2xl bg-white p-4 ${mode === 'practice' ? 'opacity-50' : ''}`}>
             <label className="text-sm font-semibold text-slate-700">Time limit</label>
             <div className="mt-2 grid grid-cols-3 gap-2">
               {[5, 10, 20].map((m) => (
@@ -222,7 +222,7 @@ export default function SetupPage() {
             onClick={start}
             disabled={!canStart}
             className={[
-              'mt-3 w-full rounded-2xl px-4 py-3 text-sm font-bold shadow-sm transition',
+              'mt-4 w-full rounded-2xl px-5 py-4 text-base font-bold shadow-sm transition',
               canStart
                 ? 'bg-sky-500 text-white hover:bg-sky-600'
                 : 'bg-slate-200 text-slate-500 cursor-not-allowed',
