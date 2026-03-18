@@ -185,6 +185,7 @@ export default function SetupPage() {
             Start quiz
           </button>
         </div>
+        </div>
       </div>
     </div>
   )
