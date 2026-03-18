@@ -66,11 +66,43 @@ export function generateQuiz(setup: QuizSetup): QuizQuestion[] {
   const pool = unseen.length >= setup.numberOfQuestions ? unseen : filtered
 
   const picked = shuffle(pool).slice(0, Math.max(1, setup.numberOfQuestions))
-
-  const nextHistoryIds = [...picked.map((q) => q.id), ...history.recentQuestionIds].slice(0, HISTORY_LIMIT)
-  writeJson(HISTORY_KEY, { recentQuestionIds: nextHistoryIds } satisfies RecentHistory)
-
   return picked
+}
+
+export function getPoolQuestions(
+  setup: QuizSetup,
+  options?: {
+    ignoreDifficulty?: boolean
+  },
+): QuizQuestion[] {
+  const subject = bank.subjects.find((s) => s.name === setup.subjectName)
+  if (!subject) return []
+
+  const topics = setup.topicName ? subject.topics.filter((t) => t.name === setup.topicName) : subject.topics
+  const allQuestions: QuizQuestion[] = topics.flatMap((t) =>
+    t.questions.map((q) => toQuizQuestion(q, subject.name, t.name)),
+  )
+
+  const ignoreDifficulty = options?.ignoreDifficulty ?? false
+
+  const filtered = allQuestions.filter((q) => {
+    const typeOk = setup.questionType === 'mixed' ? true : q.type === setup.questionType
+    const diffOk = ignoreDifficulty ? true : setup.difficulty === 'mixed' ? true : q.difficulty === setup.difficulty
+    return typeOk && diffOk
+  })
+
+  const history = readJson<RecentHistory>(HISTORY_KEY, { recentQuestionIds: [] })
+  const recent = new Set(history.recentQuestionIds)
+  const unseen = filtered.filter((q) => !recent.has(q.id))
+  const pool = unseen.length >= setup.numberOfQuestions ? unseen : filtered
+
+  return pool
+}
+
+export function recordRecentQuestionIds(questionIds: string[]) {
+  const history = readJson<RecentHistory>(HISTORY_KEY, { recentQuestionIds: [] })
+  const nextHistoryIds = [...questionIds, ...history.recentQuestionIds].slice(0, HISTORY_LIMIT)
+  writeJson(HISTORY_KEY, { recentQuestionIds: nextHistoryIds } satisfies RecentHistory)
 }
 
 export function pickAdaptiveNextDifficulty(current: Difficulty, wasCorrect: boolean): Difficulty {
