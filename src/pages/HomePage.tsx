@@ -1,33 +1,8 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { listSubjects } from '../utils/questionBank'
-import { readJson, writeJson } from '../utils/storage'
-import type { AudienceMode } from '../types/quiz'
 
 export default function HomePage() {
   const subjects = listSubjects()
-  const PREF_KEY = 'prefs'
-  const prefs = readJson<{ lastAudienceMode?: AudienceMode }>(PREF_KEY, {})
-  const initialAudienceMode: AudienceMode = prefs.lastAudienceMode === 'children' || prefs.lastAudienceMode === 'general' ? prefs.lastAudienceMode : 'general'
-  const [audienceMode, setAudienceMode] = useState<AudienceMode>(initialAudienceMode)
-
-  const defaultPrefs = {
-    numberOfQuestions: 10,
-    timeLimitSeconds: 10 * 60,
-    difficulty: 'mixed' as const,
-    questionType: 'mixed' as const,
-    mode: 'timed' as const,
-    lastSubjectName: undefined as string | undefined,
-    topicName: undefined as string | undefined,
-    audienceMode: undefined as AudienceMode | undefined,
-    lastAudienceMode: undefined as AudienceMode | undefined,
-  }
-
-  const selectedLabel = audienceMode === 'children' ? 'Children Mode' : 'General Mode'
-  const modeDescription =
-    audienceMode === 'children'
-      ? 'Fun quizzes with simpler steps.'
-      : 'More challenge for your exam preparation.'
 
   return (
     <div className="flex-1 p-3 sm:p-4">
@@ -48,53 +23,8 @@ export default function HomePage() {
         <div className="rounded-[1.5rem] bg-white/70 p-3 shadow-sm ring-1 ring-slate-200/70">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">{selectedLabel}</h2>
-              <p className="mt-1 text-xs text-slate-500">{modeDescription}</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 sm:max-w-[280px]">
-              <button
-                type="button"
-                onClick={() => {
-                  setAudienceMode('children')
-                  const current = readJson<Record<string, unknown>>(PREF_KEY, {})
-                  writeJson(PREF_KEY, {
-                    ...defaultPrefs,
-                    ...current,
-                    audienceMode: 'children',
-                    lastAudienceMode: 'children',
-                  })
-                }}
-                className={[
-                  'rounded-2xl px-3 py-2 text-sm font-semibold ring-1 transition',
-                  audienceMode === 'children'
-                    ? 'bg-[#A855F7] text-white ring-[#A855F7]'
-                    : 'bg-white text-slate-700 ring-slate-200 hover:bg-slate-50',
-                ].join(' ')}
-              >
-                Children
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setAudienceMode('general')
-                  const current = readJson<Record<string, unknown>>(PREF_KEY, {})
-                  writeJson(PREF_KEY, {
-                    ...defaultPrefs,
-                    ...current,
-                    audienceMode: 'general',
-                    lastAudienceMode: 'general',
-                  })
-                }}
-                className={[
-                  'rounded-2xl px-3 py-2 text-sm font-semibold ring-1 transition',
-                  audienceMode === 'general'
-                    ? 'bg-[#F97316] text-white ring-[#F97316]'
-                    : 'bg-white text-slate-700 ring-slate-200 hover:bg-slate-50',
-                ].join(' ')}
-              >
-                General
-              </button>
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Choose a category</h2>
+              <p className="mt-1 text-xs text-slate-500">Select a subject and set your quiz.</p>
             </div>
           </div>
         </div>
@@ -103,7 +33,7 @@ export default function HomePage() {
           {subjects.map((s, idx) => (
             <Link
               key={s.name}
-              to={`/setup?subject=${encodeURIComponent(s.name)}&audience=${audienceMode}`}
+              to={`/setup?subject=${encodeURIComponent(s.name)}`}
               className={[
                 'flex h-28 flex-col justify-between rounded-[1.5rem] p-4 text-white shadow-sm transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg',
                 idx % 5 === 0

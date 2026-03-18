@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { listSubjects, listTopicsForSubject } from '../utils/questionBank'
-import type { AudienceMode, Difficulty, QuizMode, QuestionType, QuizSetup } from '../types/quiz'
+import type { Difficulty, QuizMode, QuestionType, QuizSetup } from '../types/quiz'
 import { writeJson, readJson } from '../utils/storage'
 
 function useQuery() {
@@ -26,15 +26,6 @@ export default function SetupPage() {
   })
 
   const subjectName = q.get('subject') ?? initialPrefs.lastSubjectName ?? subjects[0]?.name ?? ''
-  const audienceFromUrl = q.get('audience')
-  const initialAudienceMode: AudienceMode =
-    audienceFromUrl === 'children' || audienceFromUrl === 'general'
-      ? audienceFromUrl
-      : initialPrefs.audienceMode === 'children' || initialPrefs.audienceMode === 'general'
-        ? initialPrefs.audienceMode
-        : 'general'
-
-  const [audienceMode, setAudienceMode] = useState<AudienceMode>(initialAudienceMode)
   const [topicName, setTopicName] = useState<string | undefined>(initialPrefs.topicName)
 
   const topics = useMemo(() => listTopicsForSubject(subjectName), [subjectName])
@@ -57,7 +48,6 @@ export default function SetupPage() {
       difficulty,
       questionType,
       mode,
-      audienceMode,
       topicName: canPickTopic ? topicName : undefined,
     }
     writeJson(PREF_KEY, {
@@ -67,9 +57,7 @@ export default function SetupPage() {
       questionType,
       mode,
       lastSubjectName: subjectName,
-      lastAudienceMode: audienceMode,
       topicName: canPickTopic ? topicName : undefined,
-      audienceMode,
     })
     writeJson('currentSetup', setup)
     navigate('/quiz')
@@ -98,36 +86,7 @@ export default function SetupPage() {
 
         <div className="space-y-4 p-5 md:p-8">
 
-        <div className="mt-5 space-y-4">
-          <div className="rounded-2xl bg-white p-3">
-            <label className="text-sm font-semibold text-slate-700">Audience</label>
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setAudienceMode('children')}
-                className={[
-                  'rounded-xl px-3 py-2 text-sm font-semibold ring-1 transition',
-                  audienceMode === 'children'
-                    ? 'bg-[#A855F7] text-white ring-[#A855F7]'
-                    : 'bg-white text-slate-700 ring-slate-200 hover:bg-slate-50',
-                ].join(' ')}
-              >
-                Children
-              </button>
-              <button
-                type="button"
-                onClick={() => setAudienceMode('general')}
-                className={[
-                  'rounded-xl px-3 py-2 text-sm font-semibold ring-1 transition',
-                  audienceMode === 'general'
-                    ? 'bg-[#F97316] text-white ring-[#F97316]'
-                    : 'bg-white text-slate-700 ring-slate-200 hover:bg-slate-50',
-                ].join(' ')}
-              >
-                General
-              </button>
-            </div>
-          </div>
+          <div className="mt-5 space-y-4">
 
           {canPickTopic ? (
             <div className="rounded-2xl bg-white p-3">

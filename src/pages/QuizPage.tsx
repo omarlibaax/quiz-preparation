@@ -257,7 +257,7 @@ export default function QuizPage() {
           <div className="mb-4 flex items-start justify-between gap-3">
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                {setup.audienceMode === 'children' ? 'Children' : 'General'} • {setup.subjectName}
+                {setup.subjectName}
               </div>
               <div className="mt-1 text-lg font-extrabold text-slate-900">
                 Question {currentIndex + 1}
