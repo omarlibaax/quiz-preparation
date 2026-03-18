@@ -1,5 +1,5 @@
 import bankJson from '../data/questions.json'
-import type { QuestionBank, QuizQuestion, QuizSetup, Question, Difficulty } from '../types/quiz'
+import type { QuestionBank, QuizQuestion, QuizSetup, Question, Difficulty, Subject } from '../types/quiz'
 import { shuffle } from './shuffle'
 import { readJson, writeJson } from './storage'
 
@@ -33,6 +33,16 @@ export function listSubjects() {
     name: s.name,
     topics: s.topics.map((t) => t.name),
   }))
+}
+
+export function getSubject(subjectName: string): Subject | undefined {
+  return bank.subjects.find((s) => s.name === subjectName)
+}
+
+export function listTopicsForSubject(subjectName: string): string[] {
+  const subject = getSubject(subjectName)
+  if (!subject) return []
+  return subject.topics.map((t) => t.name)
 }
 
 export function generateQuiz(setup: QuizSetup): QuizQuestion[] {

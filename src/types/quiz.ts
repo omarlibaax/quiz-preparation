@@ -37,10 +37,12 @@ export type QuestionBank = {
 }
 
 export type QuizMode = 'practice' | 'timed' | 'adaptive'
+export type AudienceMode = 'children' | 'general'
 
 export type QuizSetup = {
   subjectName: string
   topicName?: string
+  audienceMode?: AudienceMode
   numberOfQuestions: number
   timeLimitSeconds: number | null
   difficulty: Difficulty | 'mixed'
