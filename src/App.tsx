@@ -4,8 +4,8 @@ import SetupPage from './pages/SetupPage'
 
 export default function App() {
   return (
-    <div className="min-h-dvh bg-gradient-to-b from-sky-500 via-indigo-500 to-slate-900">
-      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-slate-50/90 px-0 pb-4 pt-8 shadow-xl">
+    <div className="min-h-screen bg-slate-100">
+      <div className="mx-auto flex min-h-screen w-full max-w-md flex-col bg-white px-4 pb-6 pt-6 md:max-w-lg md:rounded-3xl md:shadow-lg md:mt-6">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/setup" element={<SetupPage />} />
