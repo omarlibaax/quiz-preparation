@@ -269,7 +269,21 @@ export default function QuizPage() {
             <div className="text-right">
               {timeLimitSeconds != null && (
                 <div className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-3 py-2 text-xs font-bold text-white">
-                  <span>⏱</span>
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-4 w-4"
+                    aria-hidden="true"
+                    fill="none"
+                  >
+                    <path
+                      d="M12 8v5l3 2"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+                  </svg>
                   {formatTime(timeLeftSeconds ?? 0)}
                 </div>
               )}

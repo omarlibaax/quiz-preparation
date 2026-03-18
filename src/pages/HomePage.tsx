@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { listSubjects } from '../utils/questionBank'
+import SubjectIcon from '../components/SubjectIcon'
 
 export default function HomePage() {
   const subjects = listSubjects()
@@ -49,7 +50,9 @@ export default function HomePage() {
             >
               <div className="flex items-center justify-between">
                 <div className="text-xs font-semibold opacity-90">Subject</div>
-                <div className="text-lg opacity-90">{s.name.toLowerCase().includes('math') ? '∑' : '📘'}</div>
+                <div className="text-white opacity-90">
+                  <SubjectIcon subjectName={s.name} />
+                </div>
               </div>
               <div className="leading-tight">
                 <div className="text-base font-extrabold">{s.name}</div>
