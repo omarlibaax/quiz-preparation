@@ -52,21 +52,26 @@ export default function SetupPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 py-6">
+    <div className="flex-1 px-4">
       <header className="mb-4 flex items-center justify-between">
-        <Link to="/" className="text-sm font-semibold text-slate-700 hover:text-slate-900">
-          ← Back
+        <Link to="/" className="text-xs font-semibold text-slate-100">
+          ← Home
         </Link>
-        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Setup</div>
+        <div className="rounded-full bg-slate-900/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-100 shadow">
+          Setup Quiz
+        </div>
         <div className="w-10" />
       </header>
 
-      <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-        <h1 className="text-xl font-bold">Configure your test</h1>
-        <p className="mt-1 text-sm text-slate-600">Subject: <span className="font-semibold text-slate-900">{subjectName || '—'}</span></p>
+      <div className="rounded-3xl bg-white p-5 shadow-md ring-1 ring-slate-100">
+        <h1 className="text-lg font-bold text-slate-900">Configure your test</h1>
+        <p className="mt-1 text-xs text-slate-500">
+          Subject:{' '}
+          <span className="font-semibold text-slate-900">{subjectName || '—'}</span>
+        </p>
 
         <div className="mt-5 space-y-4">
-          <div>
+          <div className="rounded-2xl bg-slate-50 p-3">
             <label className="text-sm font-semibold text-slate-700">Mode</label>
             <div className="mt-2 grid grid-cols-3 gap-2">
               {(['timed', 'practice', 'adaptive'] as const).map((m) => (
@@ -85,7 +90,7 @@ export default function SetupPage() {
             </div>
           </div>
 
-          <div>
+          <div className="rounded-2xl bg-slate-50 p-3">
             <label className="text-sm font-semibold text-slate-700">Number of questions</label>
             <div className="mt-2 flex items-center gap-3">
               <input
@@ -101,7 +106,7 @@ export default function SetupPage() {
             </div>
           </div>
 
-          <div>
+          <div className="rounded-2xl bg-slate-50 p-3">
             <label className="text-sm font-semibold text-slate-700">Difficulty</label>
             <div className="mt-2 grid grid-cols-4 gap-2">
               {(['mixed', 'easy', 'medium', 'hard'] as const).map((d) => (
@@ -120,7 +125,7 @@ export default function SetupPage() {
             </div>
           </div>
 
-          <div>
+          <div className="rounded-2xl bg-slate-50 p-3">
             <label className="text-sm font-semibold text-slate-700">Question type</label>
             <div className="mt-2 grid grid-cols-3 gap-2">
               {(['mixed', 'mcq', 'tf'] as const).map((t) => (
@@ -139,7 +144,7 @@ export default function SetupPage() {
             </div>
           </div>
 
-          <div className={mode === 'practice' ? 'opacity-50' : ''}>
+          <div className={`rounded-2xl bg-slate-50 p-3 ${mode === 'practice' ? 'opacity-50' : ''}`}>
             <label className="text-sm font-semibold text-slate-700">Time limit</label>
             <div className="mt-2 grid grid-cols-3 gap-2">
               {[5, 10, 20].map((m) => (
@@ -167,8 +172,10 @@ export default function SetupPage() {
           onClick={start}
           disabled={!canStart}
           className={[
-            'mt-6 w-full rounded-2xl px-4 py-3 text-sm font-bold shadow-sm transition',
-            canStart ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-slate-200 text-slate-500 cursor-not-allowed',
+            'mt-5 w-full rounded-3xl px-4 py-3 text-sm font-bold shadow-md transition',
+            canStart
+              ? 'bg-gradient-to-r from-indigo-500 to-sky-500 text-white hover:from-indigo-600 hover:to-sky-600'
+              : 'bg-slate-200 text-slate-500 cursor-not-allowed',
           ].join(' ')}
         >
           Start quiz

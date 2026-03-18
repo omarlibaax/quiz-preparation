@@ -5,37 +5,41 @@ export default function HomePage() {
   const subjects = listSubjects()
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 py-6">
-      <header className="mb-6">
-        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-          <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Grade 12</p>
-          <h1 className="mt-1 text-2xl font-bold leading-tight">Smart Quiz Preparation</h1>
-          <p className="mt-2 text-sm text-slate-600">
-            Pick a subject, configure your test, and get instant results with insights.
-          </p>
+    <div className="flex-1 px-4">
+      <header className="mb-4">
+        <div className="rounded-3xl bg-gradient-to-br from-sky-500 via-indigo-500 to-purple-500 p-5 text-white shadow-md">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-80">Quiz Time</p>
+              <h1 className="mt-1 text-2xl font-extrabold tracking-tight">Smart Prep</h1>
+              <p className="mt-1 text-xs text-sky-100">
+                Choose a category and start practicing instantly.
+              </p>
+            </div>
+          </div>
         </div>
       </header>
 
-      <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-700">Choose a subject</h2>
-          <span className="text-xs text-slate-500">{subjects.length} available</span>
+      <section className="mt-4 space-y-2">
+        <div className="flex items-center justify-between px-1">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Categories
+          </h2>
+          <span className="text-[11px] text-slate-400">{subjects.length} available</span>
         </div>
 
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-2 gap-3 pb-2">
           {subjects.map((s) => (
             <Link
               key={s.name}
               to={`/setup?subject=${encodeURIComponent(s.name)}`}
-              className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md"
+              className="flex h-28 flex-col justify-between rounded-3xl bg-gradient-to-br from-quiz-blue to-sky-500 p-4 text-white shadow-md transition hover:translate-y-[1px] hover:shadow-lg"
             >
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-base font-semibold text-slate-900">{s.name}</div>
-                  <div className="mt-1 text-xs text-slate-600">{s.topics.length} topics</div>
-                </div>
-                <div className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
-                  Start
+              <div className="text-xs font-semibold opacity-80">Subject</div>
+              <div>
+                <div className="text-base font-bold leading-tight">{s.name}</div>
+                <div className="mt-1 text-[11px] text-sky-100">
+                  {s.topics.length} topic{s.topics.length !== 1 ? 's' : ''}
                 </div>
               </div>
             </Link>
