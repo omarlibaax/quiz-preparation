@@ -1,0 +1,50 @@
+{
+  "subjects": [
+    {
+      "name": "Mathematics",
+      "topics": [
+        {
+          "name": "Algebra",
+          "questions": [
+            {
+              "id": "math-alg-1",
+              "type": "mcq",
+              "question": "What is 2 + 2?",
+              "options": ["2", "3", "4", "5"],
+              "answer": "4",
+              "difficulty": "easy",
+              "explanation": "Adding 2 and 2 gives 4."
+            },
+            {
+              "id": "math-alg-2",
+              "type": "tf",
+              "question": "5 is a prime number.",
+              "answer": true,
+              "difficulty": "easy",
+              "explanation": "5 has exactly two factors: 1 and 5."
+            },
+            {
+              "id": "math-alg-3",
+              "type": "mcq",
+              "question": "Solve for x: 3x = 12",
+              "options": ["2", "3", "4", "6"],
+              "answer": "4",
+              "difficulty": "easy",
+              "explanation": "Divide both sides by 3: x = 12 / 3 = 4."
+            },
+            {
+              "id": "math-alg-4",
+              "type": "mcq",
+              "question": "Which expression is equivalent to (x + 2)(x + 3)?",
+              "options": ["x^2 + 5x + 6", "x^2 + x + 6", "x^2 + 6x + 5", "x^2 + 5x + 5"],
+              "answer": "x^2 + 5x + 6",
+              "difficulty": "medium",
+              "explanation": "Expand: x^2 + 3x + 2x + 6 = x^2 + 5x + 6."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
