@@ -78,3 +78,23 @@ export async function apiPatch<TResponse, TBody>(
   return (await res.json()) as TResponse
 }
 
+export async function apiDelete(path: string, options: RequestOptions = {}): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    method: 'DELETE',
+    headers: options.accessToken
+      ? {
+          Authorization: `Bearer ${options.accessToken}`,
+        }
+      : undefined,
+  })
+  if (!res.ok) {
+    let message = `DELETE ${path} failed (${res.status})`
+    try {
+      const data = (await res.json()) as { message?: string }
+      if (data.message) message = data.message
+    } catch {
+      // ignore
+    }
+    throw new Error(message)
+  }
+}

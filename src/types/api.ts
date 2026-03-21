@@ -134,6 +134,12 @@ export type ApiQuestion = {
   explanation?: string | null
 }
 
+export type ApiQuestionOption = {
+  id: number
+  optionText: string
+  isCorrect: boolean
+}
+
 /** Full row from GET /api/questions (includes topic + subject for admin picker) */
 export type ApiQuestionListItem = {
   id: number
@@ -141,6 +147,8 @@ export type ApiQuestionListItem = {
   type: 'MCQ' | 'TF'
   questionText: string
   difficulty: 'EASY' | 'MEDIUM' | 'HARD'
+  explanation?: string | null
+  options?: ApiQuestionOption[]
   topic: {
     id: number
     name: string
@@ -150,6 +158,9 @@ export type ApiQuestionListItem = {
     }
   }
 }
+
+/** GET /api/questions/:id (admin) — same shape as list row with options */
+export type ApiQuestionDetail = ApiQuestionListItem
 
 /** Response from POST /api/exams (minimal fields used by admin UI) */
 export type ApiCreatedExam = {

@@ -16,8 +16,9 @@ import { HttpError } from '../../shared/http-error'
 
 export const questionRouter = Router()
 
-function parseQuestionId(raw: string | undefined): number {
-  const id = Number(raw)
+function parseQuestionId(raw: string | string[] | undefined): number {
+  const s = Array.isArray(raw) ? raw[0] : raw
+  const id = Number(s)
   if (!Number.isInteger(id) || id < 1) throw new HttpError(400, 'Invalid question id')
   return id
 }
