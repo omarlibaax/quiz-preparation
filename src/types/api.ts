@@ -9,3 +9,83 @@ export type ApiSubject = {
   topics: ApiTopic[]
 }
 
+export type ApiExam = {
+  id: number
+  title: string
+  durationMinutes: number
+  totalQuestions: number
+  isPublished: boolean
+  subject: {
+    id: number
+    name: string
+  }
+}
+
+export type ApiStartedAttempt = {
+  attemptId: number
+  exam: {
+    id: number
+    title: string
+    durationMinutes: number
+    totalQuestions: number
+    subjectId: number
+  }
+  questions: Array<{
+    id: number
+    type: 'MCQ' | 'TF'
+    difficulty: 'EASY' | 'MEDIUM' | 'HARD'
+    topicName: string
+    questionText: string
+    options: Array<{
+      id: number
+      optionText: string
+    }>
+  }>
+}
+
+export type ApiSubmitAttemptResult = {
+  attemptId: number
+  examId: number
+  correctCount: number
+  wrongCount: number
+  skippedCount: number
+  scorePercent: number
+}
+
+export type ApiAttemptResult = {
+  id: number
+  startedAt: string
+  submittedAt: string | null
+  exam: {
+    id: number
+    title: string
+    subject: {
+      id: number
+      name: string
+    }
+  }
+  answers: Array<{
+    questionId: number
+    selectedBoolean: boolean | null
+    question: {
+      id: number
+      type: 'MCQ' | 'TF'
+      difficulty: 'EASY' | 'MEDIUM' | 'HARD'
+      questionText: string
+      topic: {
+        name: string
+      }
+      options: Array<{
+        id: number
+        optionText: string
+        isCorrect: boolean
+      }>
+    }
+    selectedOption: {
+      id: number
+      optionText: string
+    } | null
+    isCorrect: boolean
+  }>
+}
+

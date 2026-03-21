@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { AnswerValue, Difficulty, QuizQuestion, QuizSetup } from '../types/quiz'
+import { useAuth } from '../context/AuthContext'
+import { getAttemptResult, startAttempt, submitAttempt } from '../services/attemptsApi'
+import { listPublishedExams } from '../services/examsApi'
+import { mapApiAttemptToQuizAttempt } from '../utils/attemptMapper'
 import { buildAttempt } from '../utils/scoring'
 import { generateQuiz, getPoolQuestions, pickAdaptiveNextDifficulty, recordRecentQuestionIds } from '../utils/questionBank'
 import { readCurrentSetup, writeLastAttempt } from '../utils/attemptStorage'
@@ -29,6 +33,7 @@ function countCorrectWrongSkipped(questions: QuizQuestion[], answersById: Record
 
 export default function QuizPage() {
   const navigate = useNavigate()
+  const { tokens } = useAuth()
 
   const setup = readCurrentSetup()
   const [mounted, setMounted] = useState(false)
@@ -63,6 +68,9 @@ export default function QuizPage() {
   })
 
   const [markedForReview, setMarkedForReview] = useState<Record<string, boolean>>(() => ({}))
+  const [backendAttemptId, setBackendAttemptId] = useState<number | null>(null)
+  const [backendMode, setBackendMode] = useState(false)
+  const backendOptionMapRef = useRef<Record<string, Record<string, number>>>({})
 
   // Adaptive mode: we generate questions progressively based on correctness.
   const poolRef = useRef<Record<Difficulty, QuizQuestion[]>>({ easy: [], medium: [], hard: [] })
@@ -70,6 +78,70 @@ export default function QuizPage() {
   const difficultyByIndexRef = useRef<Difficulty[]>([])
 
   const adaptiveMode = setup?.mode === 'adaptive'
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      if (!setup || !tokens?.accessToken) return
+      try {
+        const exams = await listPublishedExams()
+        const exam = exams.find((e) => e.subject.name.toLowerCase() === setup.subjectName.toLowerCase())
+        if (!exam) return
+
+        const started = await startAttempt(exam.id, tokens.accessToken)
+        if (cancelled) return
+
+        const mappedQuestions: QuizQuestion[] = started.questions.map((q) => {
+          const difficulty = q.difficulty === 'EASY' ? 'easy' : q.difficulty === 'MEDIUM' ? 'medium' : 'hard'
+          if (q.type === 'MCQ') {
+            const options = q.options.map((o) => o.optionText)
+            return {
+              id: String(q.id),
+              type: 'mcq',
+              question: q.questionText,
+              options,
+              optionsShuffled: options,
+              answer: '',
+              difficulty,
+              subjectName: setup.subjectName,
+              topicName: q.topicName,
+            }
+          }
+          return {
+            id: String(q.id),
+            type: 'tf',
+            question: q.questionText,
+            answer: false,
+            difficulty,
+            subjectName: setup.subjectName,
+            topicName: q.topicName,
+          }
+        })
+
+        const optionMap: Record<string, Record<string, number>> = {}
+        for (const q of started.questions) {
+          if (q.type !== 'MCQ') continue
+          optionMap[String(q.id)] = Object.fromEntries(q.options.map((o) => [o.optionText, o.id]))
+        }
+        backendOptionMapRef.current = optionMap
+
+        const seededAnswers: Record<string, AnswerValue> = {}
+        for (const q of mappedQuestions) seededAnswers[q.id] = null
+
+        setBackendAttemptId(started.attemptId)
+        setBackendMode(true)
+        setQuestions(mappedQuestions)
+        setAnswersById(seededAnswers)
+        setCurrentIndex(0)
+        setTimeLeftSeconds(started.exam.durationMinutes * 60)
+      } catch {
+        // keep local quiz fallback
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [setup, tokens?.accessToken])
 
   useEffect(() => {
     if (!adaptiveMode || !setup) return
@@ -110,10 +182,42 @@ export default function QuizPage() {
     return null
   }
 
-  function submit(_reason: 'finished' | 'time') {
+  async function submit(_reason: 'finished' | 'time') {
     if (!setup || submittedRef.current) return
     submittedRef.current = true
     const finishedAtIso = new Date().toISOString()
+
+    if (backendMode && backendAttemptId && tokens?.accessToken) {
+      try {
+        const payload: Array<{
+          questionId: number
+          selectedOptionId?: number
+          selectedBoolean?: boolean
+        }> = []
+
+        for (const q of questions) {
+          const raw = answersById[q.id]
+          const questionId = Number(q.id)
+          if (q.type === 'mcq') {
+            const selectedOptionId =
+              typeof raw === 'string' ? backendOptionMapRef.current[q.id]?.[raw] : undefined
+            if (selectedOptionId) payload.push({ questionId, selectedOptionId })
+            continue
+          }
+          if (typeof raw === 'boolean') payload.push({ questionId, selectedBoolean: raw })
+        }
+
+        await submitAttempt(backendAttemptId, payload, tokens.accessToken)
+        const apiAttempt = await getAttemptResult(backendAttemptId, tokens.accessToken)
+        const mapped = mapApiAttemptToQuizAttempt(apiAttempt, setup as QuizSetup, markedForReview)
+        writeLastAttempt(mapped)
+        setFinished(true)
+        navigate('/result', { replace: true })
+        return
+      } catch {
+        // fallback to local result flow
+      }
+    }
 
     const attempt = buildAttempt({
       setup: setup as QuizSetup,
@@ -171,7 +275,7 @@ export default function QuizPage() {
       const remainingMs = totalMs - elapsed
       const remainingSeconds = Math.ceil(remainingMs / 1000)
       setTimeLeftSeconds(Math.max(0, remainingSeconds))
-      if (remainingMs <= 0) submit('time')
+      if (remainingMs <= 0) void submit('time')
       else raf = window.requestAnimationFrame(tick)
     }
 
@@ -224,7 +328,7 @@ export default function QuizPage() {
     }
 
     const isLast = currentIndex >= questions.length - 1
-    if (isLast) submit('finished')
+    if (isLast) void submit('finished')
     else setCurrentIndex((i) => i + 1)
   }
 
@@ -288,7 +392,9 @@ export default function QuizPage() {
                 </div>
               )}
               <div className="mt-2 text-sm text-slate-500">
-                Correct: {correct} • Wrong: {wrong} • Skipped: {skipped}
+                {backendMode
+                  ? `Answered: ${Object.values(answersById).filter((v) => v !== null).length} • Skipped: ${skipped}`
+                  : `Correct: ${correct} • Wrong: ${wrong} • Skipped: ${skipped}`}
               </div>
             </div>
           </div>
@@ -381,7 +487,7 @@ export default function QuizPage() {
               type="button"
               onClick={() => {
                 const isLast = currentIndex >= (setup.mode === 'adaptive' ? totalQuestions - 1 : questions.length - 1)
-                if (setup.mode !== 'adaptive' && isLast) submit('finished')
+                if (setup.mode !== 'adaptive' && isLast) void submit('finished')
                 else goNext()
               }}
               className="rounded-[1.6rem] bg-gradient-to-r from-sky-500 to-indigo-500 px-6 py-3 text-base font-extrabold text-white shadow-sm"
