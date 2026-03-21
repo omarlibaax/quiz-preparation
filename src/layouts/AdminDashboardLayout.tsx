@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react'
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -7,17 +8,46 @@ import { cn } from '../utils/cn'
 import { AdminHeader } from '../components/admin/AdminHeader'
 import { AdminRightPanel } from '../components/admin/AdminRightPanel'
 
-const mainNav = [
-  { to: '/admin/dashboard', label: 'Dashboard', icon: IconHome, badge: '12' },
-  { to: '/admin/users', label: 'Users', icon: IconUsers },
-  { to: '/admin/exams', label: 'Exams', icon: IconDoc },
-]
+type NavItem = {
+  to: string
+  label: string
+  icon: ComponentType<{ className?: string }>
+  /** Only match exact path (e.g. avoid /admin/exams matching /admin/exams/builder) */
+  end?: boolean
+}
 
-const generalNav = [
-  { to: '/admin/questions', label: 'Question Bank', icon: IconBank },
-  { to: '/admin/analytics', label: 'Analytics', icon: IconChart },
-  { to: '/admin/settings', label: 'Settings', icon: IconGear },
-  { to: '/admin/operations', label: 'Operations', icon: IconTool },
+const navSections: { title: string; items: NavItem[] }[] = [
+  {
+    title: 'Overview',
+    items: [{ to: '/admin/dashboard', label: 'Dashboard', icon: IconHome, end: true }],
+  },
+  {
+    title: 'Content',
+    items: [
+      { to: '/admin/subjects', label: 'Subjects & topics', icon: IconFolder },
+      { to: '/admin/questions', label: 'Question bank', icon: IconBank },
+      { to: '/admin/import', label: 'Import data', icon: IconTool },
+    ],
+  },
+  {
+    title: 'Exams',
+    items: [
+      { to: '/admin/exams', label: 'All exams', icon: IconDoc, end: true },
+      { to: '/admin/exams/builder', label: 'Create exam', icon: IconPlus },
+    ],
+  },
+  {
+    title: 'People',
+    items: [{ to: '/admin/users', label: 'Users', icon: IconUsers }],
+  },
+  {
+    title: 'Insights',
+    items: [{ to: '/admin/analytics', label: 'Analytics', icon: IconChart }],
+  },
+  {
+    title: 'System',
+    items: [{ to: '/admin/settings', label: 'Settings', icon: IconGear }],
+  },
 ]
 
 export default function AdminDashboardLayout() {
