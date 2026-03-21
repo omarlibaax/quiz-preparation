@@ -19,7 +19,9 @@ import AdminExamsPage from './pages/admin/AdminExamsPage'
 import AdminQuestionsPage from './pages/admin/AdminQuestionsPage'
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage'
 import AdminSettingsPage from './pages/admin/AdminSettingsPage'
-import AdminOperationsPage from './pages/admin/AdminOperationsPage'
+import AdminImportPage from './pages/admin/AdminImportPage'
+import AdminSubjectsPage from './pages/admin/AdminSubjectsPage'
+import AdminExamBuilderPage from './pages/admin/AdminExamBuilderPage'
 
 export default function App() {
   return (
@@ -40,11 +42,14 @@ export default function App() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboardHome />} />
           <Route path="users" element={<AdminUsersPage />} />
+          <Route path="import" element={<AdminImportPage />} />
+          <Route path="subjects" element={<AdminSubjectsPage />} />
+          <Route path="exams/builder" element={<AdminExamBuilderPage />} />
           <Route path="exams" element={<AdminExamsPage />} />
           <Route path="questions" element={<AdminQuestionsPage />} />
           <Route path="analytics" element={<AdminAnalyticsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
-          <Route path="operations" element={<AdminOperationsPage />} />
+          <Route path="operations" element={<Navigate to="/admin/import" replace />} />
         </Route>
 
         <Route path="/auth" element={<AuthPage />} />

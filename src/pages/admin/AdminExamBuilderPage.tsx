@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { createExam, listAllExams, setExamPublished } from '../../services/examsApi'
+import { createExam, setExamPublished } from '../../services/examsApi'
 import { listQuestions } from '../../services/questionsApi'
 import { fetchSubjects } from '../../services/subjectsApi'
-import type { ApiExam, ApiQuestionListItem, ApiSubject } from '../../types/api'
+import type { ApiQuestionListItem, ApiSubject } from '../../types/api'
 
 /**
  * Build a new exam: pick subject, load questions, order selection, publish.
@@ -12,7 +12,6 @@ import type { ApiExam, ApiQuestionListItem, ApiSubject } from '../../types/api'
 export default function AdminExamBuilderPage() {
   const { tokens } = useAuth()
   const [subjects, setSubjects] = useState<ApiSubject[]>([])
-  const [exams, setExams] = useState<ApiExam[]>([])
 
   const [examTitle, setExamTitle] = useState('')
   const [examSubjectId, setExamSubjectId] = useState<number | ''>('')
@@ -29,27 +28,14 @@ export default function AdminExamBuilderPage() {
   const [status, setStatus] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  async function loadAll() {
-    const [s, e] = await Promise.all([fetchSubjects(), listAllExams()])
+  async function loadSubjects() {
+    const s = await fetchSubjects()
     setSubjects(s)
-    setExams(e)
   }
 
   useEffect(() => {
-    void loadAll()
+    void loadSubjects()
   }, [])
-
-  async function onTogglePublish(exam: ApiExam) {
-    if (!tokens?.accessToken) return
-    try {
-      await setExamPublished(exam.id, !exam.isPublished, tokens.accessToken)
-      setStatus(`Exam ${!exam.isPublished ? 'published' : 'unpublished'}`)
-      setError(null)
-      await loadAll()
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to update exam publish state')
-    }
-  }
 
   const examTopicsForSubject = examSubjectId
     ? subjects.find((s) => s.id === examSubjectId)?.topics ?? []
@@ -160,7 +146,7 @@ export default function AdminExamBuilderPage() {
           : `Exam created (id ${created.id})`,
       )
       setError(null)
-      await loadAll()
+      await loadSubjects()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to create exam')
     }

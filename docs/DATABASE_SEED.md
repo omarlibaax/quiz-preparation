@@ -38,7 +38,7 @@ After this, refresh **phpMyAdmin** → `exam_platform` — you should see tables
 
 ## 4. Seed users + full question bank
 
-This creates **two admin-panel accounts** (same UI and access: roles `SUPER_ADMIN` and `ADMIN`), a **Student** user, and imports **`src/data/questions.json`** into **subjects, topics, questions** (same logic as Admin → Operations import).
+This creates **two admin-panel accounts** (same UI and access: roles `SUPER_ADMIN` and `ADMIN`), a **Student** user, and imports **`src/data/questions.json`** into **subjects, topics, questions** (same logic as Admin → **Import data**).
 
 ```bash
 cd server

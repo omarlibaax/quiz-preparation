@@ -53,10 +53,12 @@ export default function AdminExamsPage() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Exam management</h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Publish exams for students. Full builder lives under Operations.</p>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Publish exams for students. Create and configure exams in <strong>Create exam</strong>.
+          </p>
         </div>
         <Link
-          to="/admin/operations"
+          to="/admin/exams/builder"
           className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700"
         >
           Open exam builder
@@ -66,10 +68,10 @@ export default function AdminExamsPage() {
       {exams.length === 0 ? (
         <EmptyState
           title="No exams yet"
-          description="Create exams in Operations or import a question bank first."
+          description="Create an exam in Create exam, or import a question bank from Import data first."
           action={
-            <Link to="/admin/operations" className="text-sm font-semibold text-indigo-600 hover:underline">
-              Go to Operations →
+            <Link to="/admin/exams/builder" className="text-sm font-semibold text-indigo-600 hover:underline">
+              Go to exam builder →
             </Link>
           }
         />
