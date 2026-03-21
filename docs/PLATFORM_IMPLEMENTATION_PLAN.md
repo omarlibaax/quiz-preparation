@@ -76,6 +76,19 @@ quiz-preparation/
 - Environment-driven configuration
 - Migration-only schema changes
 
+## Question bank (database)
+
+- **Models**: `Subject` → `Topic` → `Question` (+ `QuestionOption`). Stored in MySQL via Prisma (`server/prisma/schema.prisma`).
+- **Bulk load**: `POST /api/admin/import-question-bank` imports `src/data/questions.json` (or custom path). Also: `server` script `npm run seed:import-bank`.
+- **Admin CRUD** (requires `ADMIN` JWT):
+  - `GET /api/questions` — list (filters: `topicId`, `difficulty`, `type`, `limit`, `skip`)
+  - `GET /api/questions/:id` — detail (includes options)
+  - `POST /api/questions` — create
+  - `PATCH /api/questions/:id` — update
+  - `DELETE /api/questions/:id` — delete
+- **Subjects / topics**: `POST /api/subjects` and `POST /api/subjects/topics` (admin).
+- **UI**: Admin → **Question Bank** — filters, new subject/topic, **New question**, edit/delete, link to Operations for JSON import.
+
 ## Immediate Next Steps (Current Sprint)
 
 1. Create backend scaffold under `server/`
