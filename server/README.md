@@ -37,6 +37,8 @@ API base: `http://localhost:4000`
 - `POST /api/attempts/start` (AUTH)
 - `POST /api/attempts/:attemptId/submit` (AUTH)
 - `GET /api/attempts/:attemptId` (AUTH)
+- `GET /api/students/me/dashboard` (AUTH)
+- `POST /api/admin/import-question-bank` (ADMIN)
 
 ## Optional Docker
 

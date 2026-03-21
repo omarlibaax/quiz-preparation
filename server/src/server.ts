@@ -1,9 +1,11 @@
+import { adminRouter } from './modules/admin/admin.routes'
 import cors from 'cors'
 import express from 'express'
 import { authRouter } from './modules/auth/auth.routes'
 import { attemptRouter } from './modules/attempts/attempts.routes'
 import { examRouter } from './modules/exams/exams.routes'
 import { questionRouter } from './modules/questions/questions.routes'
+import { studentRouter } from './modules/students/students.routes'
 import { subjectRouter } from './modules/subjects/subjects.routes'
 import { errorHandler } from './shared/error-handler'
 
@@ -26,6 +28,8 @@ app.use('/api/subjects', subjectRouter)
 app.use('/api/questions', questionRouter)
 app.use('/api/exams', examRouter)
 app.use('/api/attempts', attemptRouter)
+app.use('/api/students', studentRouter)
+app.use('/api/admin', adminRouter)
 
 app.use(errorHandler)
 
