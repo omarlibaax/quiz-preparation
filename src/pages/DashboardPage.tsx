@@ -35,7 +35,12 @@ export default function DashboardPage() {
           ← Back
         </Link>
         <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Dashboard</div>
-        <div className="w-10" />
+        <Link
+          to="/attempts"
+          className="text-xs font-semibold text-indigo-600 transition hover:text-indigo-800"
+        >
+          All attempts
+        </Link>
       </header>
 
       <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80">
@@ -73,7 +78,12 @@ export default function DashboardPage() {
             </div>
 
             <div>
-              <h2 className="text-sm font-bold text-slate-900">Recent Attempts</h2>
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="text-sm font-bold text-slate-900">Recent Attempts</h2>
+                <Link to="/attempts" className="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+                  View all →
+                </Link>
+              </div>
               <div className="mt-2 space-y-2">
                 {data.recentAttempts.length === 0 ? (
                   <div className="text-sm text-slate-500">No attempts yet.</div>

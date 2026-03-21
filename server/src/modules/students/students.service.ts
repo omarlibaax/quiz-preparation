@@ -90,3 +90,35 @@ export async function getStudentDashboard(userId: number) {
   }
 }
 
+export async function listStudentAttempts(userId: number, limit = 50) {
+  const take = Math.min(100, Math.max(1, limit))
+  const attempts = await prisma.attempt.findMany({
+    where: {
+      userId,
+      submittedAt: { not: null },
+    },
+    include: {
+      exam: {
+        include: {
+          subject: true,
+        },
+      },
+    },
+    orderBy: { submittedAt: 'desc' },
+    take,
+  })
+
+  return attempts.map((a) => ({
+    attemptId: a.id,
+    examId: a.examId,
+    examTitle: a.exam.title,
+    subjectName: a.exam.subject.name,
+    scorePercent: a.scorePercent,
+    correctCount: a.correctCount,
+    wrongCount: a.wrongCount,
+    skippedCount: a.skippedCount,
+    startedAt: a.startedAt,
+    submittedAt: a.submittedAt,
+  }))
+}
+

@@ -82,6 +82,12 @@ export default function HomePage() {
               >
                 Dashboard
               </Link>
+              <Link
+                to="/attempts"
+                className="rounded-xl bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-800 ring-1 ring-sky-200 transition hover:bg-sky-100"
+              >
+                Attempts
+              </Link>
               {user?.role === 'ADMIN' ? (
                 <Link
                   to="/admin"

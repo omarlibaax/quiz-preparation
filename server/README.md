@@ -38,6 +38,7 @@ API base: `http://localhost:4000`
 - `POST /api/attempts/:attemptId/submit` (AUTH)
 - `GET /api/attempts/:attemptId` (AUTH)
 - `GET /api/students/me/dashboard` (AUTH)
+- `GET /api/students/me/attempts?limit=50` (AUTH)
 - `POST /api/admin/import-question-bank` (ADMIN)
 - `POST /api/admin/bootstrap-admin` (public, one-time, requires bootstrap secret)
 

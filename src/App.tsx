@@ -4,6 +4,7 @@ import RequireAdmin from './components/RequireAdmin'
 import HomePage from './pages/HomePage'
 import AuthPage from './pages/AuthPage'
 import AdminPanelPage from './pages/AdminPanelPage'
+import AttemptsPage from './pages/AttemptsPage'
 import DashboardPage from './pages/DashboardPage'
 import SetupPage from './pages/SetupPage'
 import QuizPage from './pages/QuizPage'
@@ -32,6 +33,14 @@ export default function App() {
                 element={
                   <RequireAuth>
                     <DashboardPage />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/attempts"
+                element={
+                  <RequireAuth>
+                    <AttemptsPage />
                   </RequireAuth>
                 }
               />

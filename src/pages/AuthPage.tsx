@@ -23,7 +23,6 @@ export default function AuthPage() {
   const [bootstrapPassword, setBootstrapPassword] = useState('')
   const [bootstrapSecret, setBootstrapSecret] = useState('')
   const [bootstrapSubmitting, setBootstrapSubmitting] = useState(false)
-  const [bootstrapMessage, setBootstrapMessage] = useState<string | null>(null)
   const navigate = useNavigate()
   const query = useQuery()
   const returnTo = query.get('returnTo') || '/'
@@ -49,7 +48,6 @@ export default function AuthPage() {
   async function onBootstrapSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setBootstrapSubmitting(true)
-    setBootstrapMessage(null)
     setError(null)
     try {
       await bootstrapAdmin({
@@ -58,11 +56,9 @@ export default function AuthPage() {
         password: bootstrapPassword,
         bootstrapSecret,
       })
-      setBootstrapMessage('Admin account created. You can log in with that email and password.')
-      setMode('login')
-      setEmail(bootstrapEmail.trim())
-      setPassword('')
+      await login({ email: bootstrapEmail.trim(), password: bootstrapPassword })
       setShowBootstrap(false)
+      navigate(returnTo, { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Bootstrap failed')
     } finally {
@@ -152,10 +148,6 @@ export default function AuthPage() {
               {isSubmitting ? 'Please wait...' : mode === 'login' ? 'Login' : 'Create account'}
             </button>
           </form>
-
-          {bootstrapMessage ? (
-            <div className="rounded-2xl bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800">{bootstrapMessage}</div>
-          ) : null}
 
           <div className="border-t border-slate-200 pt-4">
             <button

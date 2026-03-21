@@ -89,6 +89,20 @@ export type ApiAttemptResult = {
   }>
 }
 
+/** Row from GET /api/students/me/attempts */
+export type ApiStudentAttempt = {
+  attemptId: number
+  examId: number
+  examTitle: string
+  subjectName: string
+  scorePercent: number
+  correctCount: number
+  wrongCount: number
+  skippedCount: number
+  startedAt: string
+  submittedAt: string | null
+}
+
 export type ApiStudentDashboard = {
   totalAttempts: number
   averageScore: number
