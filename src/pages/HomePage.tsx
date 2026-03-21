@@ -1,5 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
+import {
+  SITE_DESCRIPTION,
+  SITE_KEYWORDS,
+  SITE_NAME,
+  SITE_TITLE,
+  getCanonicalPath,
+  getSiteUrl,
+} from '../config/siteMeta'
 import { listSubjects } from '../utils/questionBank'
 import SubjectIcon from '../components/SubjectIcon'
 import { fetchSubjects } from '../services/subjectsApi'
@@ -36,6 +45,33 @@ export default function HomePage() {
     }
   }, [])
 
+  const canonicalUrl = useMemo(() => getCanonicalPath('/'), [])
+  const siteUrl = useMemo(() => getSiteUrl(), [])
+  const ogImageUrl = useMemo(() => (siteUrl ? `${siteUrl}/favicon.svg` : '/favicon.svg'), [siteUrl])
+
+  const structuredData = useMemo(
+    () => ({
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'WebSite',
+          '@id': `${canonicalUrl}#website`,
+          url: canonicalUrl,
+          name: SITE_NAME,
+          description: SITE_DESCRIPTION,
+          inLanguage: 'en-US',
+        },
+        {
+          '@type': 'Organization',
+          '@id': `${canonicalUrl}#organization`,
+          name: SITE_NAME,
+          url: canonicalUrl,
+        },
+      ],
+    }),
+    [canonicalUrl],
+  )
+
   const accents = [
     { ring: 'ring-violet-500/25', glow: 'from-violet-500/20 to-transparent', icon: 'from-violet-500 to-indigo-600' },
     { ring: 'ring-sky-500/25', glow: 'from-sky-500/20 to-transparent', icon: 'from-sky-500 to-cyan-600' },
@@ -46,6 +82,28 @@ export default function HomePage() {
 
   return (
     <div className="w-full">
+      <Helmet>
+        <title>{SITE_TITLE}</title>
+        <meta name="description" content={SITE_DESCRIPTION} />
+        <meta name="keywords" content={SITE_KEYWORDS} />
+        <link rel="canonical" href={canonicalUrl} />
+
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={SITE_NAME} />
+        <meta property="og:title" content={SITE_TITLE} />
+        <meta property="og:description" content={SITE_DESCRIPTION} />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={ogImageUrl} />
+        <meta property="og:locale" content="en_US" />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={SITE_TITLE} />
+        <meta name="twitter:description" content={SITE_DESCRIPTION} />
+        <meta name="twitter:image" content={ogImageUrl} />
+
+        <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
+      </Helmet>
+
       {/* Hero — full width, not inside a card */}
       <section className="relative overflow-hidden border-b border-slate-200/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50/40 px-4 py-16 dark:border-slate-800 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/40 sm:px-6 lg:px-8">
         <div className="pointer-events-none absolute -right-24 top-0 h-72 w-72 rounded-full bg-[#845adf]/20 blur-3xl dark:bg-[#845adf]/10" />

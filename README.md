@@ -50,11 +50,14 @@ From the repo root:
 npm install
 ```
 
-Optional: create `.env` in the project root (only if the API is **not** on `http://localhost:4000`):
+Optional: create `.env` in the project root:
 
 ```env
 # Leave unset in dev to use Vite’s proxy: same-origin `/api` → http://localhost:4000
 # VITE_API_BASE_URL=http://localhost:4000
+
+# Public site URL (SEO: canonical, Open Graph). Use your production domain when you deploy.
+# VITE_SITE_URL=https://yourdomain.com
 ```
 
 ```bash
