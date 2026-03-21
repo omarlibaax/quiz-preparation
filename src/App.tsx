@@ -4,6 +4,7 @@ import RequireAuth from './components/RequireAuth'
 import RequireAdmin from './components/RequireAdmin'
 import AdminDashboardLayout from './layouts/AdminDashboardLayout'
 import MainShell from './layouts/MainShell'
+import QuizFocusShell from './layouts/QuizFocusShell'
 import HomePage from './pages/HomePage'
 import AuthPage from './pages/AuthPage'
 import AttemptsPage from './pages/AttemptsPage'
@@ -43,9 +44,10 @@ export default function App() {
           <Route path="operations" element={<AdminOperationsPage />} />
         </Route>
 
+        <Route path="/auth" element={<AuthPage />} />
+
         <Route element={<MainShell />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/auth" element={<AuthPage />} />
           <Route
             path="/dashboard"
             element={
@@ -62,6 +64,9 @@ export default function App() {
               </RequireAuth>
             }
           />
+        </Route>
+
+        <Route element={<QuizFocusShell />}>
           <Route
             path="/setup"
             element={

@@ -343,9 +343,11 @@ export default function QuizPage() {
   if (!setup) return null
   if (!currentQuestion) {
     return (
-      <div className="mx-auto w-full max-w-3xl px-4 py-8">
-        <div className="rounded-3xl bg-white p-6 shadow-md ring-1 ring-slate-100">
-          Loading quiz...
+      <div className="relative z-10 flex min-h-[50vh] items-center justify-center px-4 py-16">
+        <div className="flex max-w-md flex-col items-center gap-4 text-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-2 border-[#845adf] border-t-transparent" />
+          <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">Preparing your session…</p>
+          <p className="text-xs text-slate-500">Loading questions and syncing timer</p>
         </div>
       </div>
     )
@@ -357,30 +359,27 @@ export default function QuizPage() {
   const { correct, wrong, skipped } = countCorrectWrongSkipped(questions, answersById)
 
   return (
-    <div className="flex-1 px-2 sm:px-5">
-      <div className="mx-auto w-full max-w-3xl py-7 sm:py-8">
-        <div className="rounded-3xl bg-white p-5 sm:p-6 shadow-sm ring-1 ring-slate-100/90">
-          <div className="mb-4 flex items-start justify-between gap-3">
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+    <div className="relative z-10 pb-28">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        {/* Session overview — full-width strip, not a single “quiz box” */}
+        <section className="rounded-2xl border border-slate-200/90 bg-white/90 p-4 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/90 sm:p-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="rounded-full bg-[#845adf]/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#845adf] dark:bg-[#845adf]/20 dark:text-[#c4b5fd]">
                 {setup.subjectName}
-              </div>
-              <div className="mt-1 text-xl font-extrabold text-slate-900 sm:text-2xl">
+              </span>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                {setup.mode} mode
+              </span>
+              <h1 className="text-lg font-extrabold text-slate-900 dark:text-white sm:text-xl">
                 Question {currentIndex + 1}
-                <span className="ml-2 text-sm font-semibold text-slate-500">
-                  of {totalQuestions}
-                </span>
-              </div>
+                <span className="ml-2 text-sm font-semibold text-slate-500">/ {totalQuestions}</span>
+              </h1>
             </div>
-            <div className="text-right">
-              {timeLimitSeconds != null && (
-                <div className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600/10 px-4 py-2 text-sm font-bold text-indigo-700 ring-1 ring-indigo-200">
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="h-5 w-5"
-                    aria-hidden="true"
-                    fill="none"
-                  >
+            <div className="flex flex-wrap items-center justify-end gap-3">
+              {timeLimitSeconds != null ? (
+                <div className="inline-flex items-center gap-2 rounded-xl border border-[#845adf]/25 bg-[#845adf]/10 px-4 py-2 text-sm font-bold text-[#845adf] dark:text-[#c4b5fd]">
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden fill="none">
                     <path
                       d="M12 8v5l3 2"
                       stroke="currentColor"
@@ -392,146 +391,169 @@ export default function QuizPage() {
                   </svg>
                   {formatTime(timeLeftSeconds ?? 0)}
                 </div>
-              )}
-              <div className="mt-2 text-sm text-slate-500">
+              ) : null}
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 {backendMode
-                  ? `Answered: ${Object.values(answersById).filter((v) => v !== null).length} • Skipped: ${skipped}`
-                  : `Correct: ${correct} • Wrong: ${wrong} • Skipped: ${skipped}`}
-              </div>
+                  ? `Answered ${Object.values(answersById).filter((v) => v !== null).length} · Skipped ${skipped}`
+                  : `Correct ${correct} · Wrong ${wrong} · Skipped ${skipped}`}
+              </p>
             </div>
           </div>
-
-          <div className="mb-5">
-            <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
-              <div className="h-full rounded-full bg-gradient-to-r from-sky-500 to-indigo-500 transition-all" style={{ width: `${progress}%` }} />
+          <div className="mt-4">
+            <div className="mb-1 flex justify-between text-xs font-bold uppercase tracking-wide text-slate-500">
+              <span>Progress</span>
+              <span>{progress}%</span>
+            </div>
+            <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-[#845adf] via-indigo-500 to-sky-500 transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
             </div>
           </div>
+        </section>
 
-          <div className="mb-4">
-            <div className="rounded-[1.8rem] bg-slate-50 p-5 ring-1 ring-slate-100">
-              <div className="text-xs font-semibold text-slate-500">
-                Topic: {currentQuestion.topicName}
-              </div>
-              <div className="mt-2 text-lg font-extrabold text-slate-900">
+        {/* Question navigator */}
+        <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/70 px-3 py-3 dark:border-slate-800 dark:bg-slate-900/70 sm:px-4">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Jump to question</span>
+            <span className="text-[10px] font-semibold text-slate-400">Green = answered · Purple = review</span>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {Array.from({ length: setup.numberOfQuestions }).map((_, i) => {
+              const q = questions[i]
+              const answered = q ? answersById[q.id] != null : false
+              const review = q ? !!markedForReview[q.id] : false
+              const isActive = i === currentIndex
+              const isGenerated = !!q
+              let pill =
+                'h-10 min-w-[2.5rem] shrink-0 rounded-xl text-sm font-bold ring-1 transition '
+              if (!isGenerated) {
+                pill += 'cursor-not-allowed bg-slate-100 text-slate-400 ring-slate-200 opacity-60'
+              } else if (isActive) {
+                pill += 'bg-[#845adf] text-white ring-[#845adf] shadow-md'
+              } else if (answered) {
+                pill += 'bg-emerald-600 text-white ring-emerald-600'
+              } else if (review && !answered) {
+                pill += 'bg-violet-600 text-white ring-violet-600'
+              } else {
+                pill +=
+                  'bg-white text-slate-700 ring-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200'
+              }
+              return (
+                <button key={i} type="button" disabled={!isGenerated} onClick={() => goToIndex(i)} className={pill}>
+                  {i + 1}
+                </button>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* Split layout: stem + answers as separate surfaces */}
+        <div className="mt-6 grid gap-6 xl:grid-cols-12">
+          <section className="xl:col-span-7">
+            <div className="h-full rounded-2xl border border-slate-200/90 bg-white p-6 shadow-card dark:border-slate-800 dark:bg-slate-900 sm:p-8">
+              <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Topic</p>
+              <p className="mt-2 text-sm font-semibold text-[#845adf]">{currentQuestion.topicName}</p>
+              <p className="mt-6 text-xl font-bold leading-relaxed text-slate-900 dark:text-white sm:text-2xl">
                 {currentQuestion.question}
-              </div>
+              </p>
             </div>
-          </div>
+          </section>
 
-          {currentQuestion.type === 'mcq' ? (
-            <div className="grid gap-3">
-              {currentQuestion.optionsShuffled?.map((opt) => {
-                const selected = answersById[currentQuestion.id] === opt
-                return (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => setAnswer(opt)}
-                    className={[
-                      'rounded-[1.6rem] px-5 py-4 text-left text-base font-semibold ring-1 transition-all duration-200',
-                      selected
-                        ? 'bg-indigo-600 text-white ring-indigo-600 shadow-sm'
-                        : 'bg-white text-slate-800 ring-slate-200 hover:bg-slate-50 hover:shadow-sm',
-                    ].join(' ')}
-                  >
-                    {opt}
-                  </button>
-                )
-              })}
+          <section className="xl:col-span-5">
+            <div className="rounded-2xl border border-slate-200/90 bg-white/95 p-5 shadow-card dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+              <p className="mb-4 text-xs font-bold uppercase tracking-wide text-slate-500">
+                {currentQuestion.type === 'mcq' ? 'Select an answer' : 'True or false'}
+              </p>
+              {currentQuestion.type === 'mcq' ? (
+                <div className="flex flex-col gap-3">
+                  {currentQuestion.optionsShuffled?.map((opt) => {
+                    const selected = answersById[currentQuestion.id] === opt
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setAnswer(opt)}
+                        className={[
+                          'rounded-xl px-4 py-4 text-left text-sm font-semibold ring-1 transition-all duration-200 sm:text-base',
+                          selected
+                            ? 'bg-[#845adf] text-white ring-[#845adf] shadow-lg shadow-[#845adf]/20'
+                            : 'bg-slate-50 text-slate-800 ring-slate-200 hover:bg-white hover:ring-[#845adf]/40 dark:bg-slate-800/80 dark:text-slate-100 dark:ring-slate-700',
+                        ].join(' ')}
+                      >
+                        {opt}
+                      </button>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  {([true, false] as const).map((v) => {
+                    const selected = answersById[currentQuestion.id] === v
+                    return (
+                      <button
+                        key={String(v)}
+                        type="button"
+                        onClick={() => setAnswer(v)}
+                        className={[
+                          'rounded-xl px-4 py-5 text-base font-bold ring-1 transition-all duration-200',
+                          selected
+                            ? 'bg-emerald-600 text-white ring-emerald-600 shadow-md'
+                            : 'bg-slate-50 text-slate-800 ring-slate-200 hover:bg-white dark:bg-slate-800 dark:text-slate-100',
+                        ].join(' ')}
+                      >
+                        {v ? 'True' : 'False'}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-3">
-              {([true, false] as const).map((v) => {
-                const selected = answersById[currentQuestion.id] === v
-                return (
-                  <button
-                    key={String(v)}
-                    type="button"
-                    onClick={() => setAnswer(v)}
-                    className={[
-                        'rounded-[1.6rem] px-5 py-4 text-base font-bold ring-1 transition-all duration-200',
-                      selected
-                        ? 'bg-emerald-600 text-white ring-emerald-600 shadow-sm'
-                        : 'bg-white text-slate-800 ring-slate-200 hover:bg-slate-50 hover:shadow-sm',
-                    ].join(' ')}
-                  >
-                    {v ? 'True' : 'False'}
-                  </button>
-                )
-              })}
-            </div>
-          )}
+          </section>
+        </div>
+      </div>
 
-          <div className="mt-5 flex items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={goPrev}
-              disabled={currentIndex === 0}
-              className="rounded-[1.6rem] bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 disabled:opacity-50"
-            >
-              Previous
-            </button>
-
-            <button
-              type="button"
-              onClick={toggleReview}
-              className={[
-                'rounded-[1.6rem] px-5 py-3 text-sm font-semibold ring-1 transition',
-                markedForReview[currentQuestion.id]
-                  ? 'bg-[#A855F7] text-white ring-[#A855F7]'
-                  : 'bg-white text-slate-700 ring-slate-200 hover:bg-slate-50',
-              ].join(' ')}
-            >
-              {markedForReview[currentQuestion.id] ? 'Marked for review' : 'Mark for review'}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                const isLast = currentIndex >= (setup.mode === 'adaptive' ? totalQuestions - 1 : questions.length - 1)
-                if (setup.mode !== 'adaptive' && isLast) void submit('finished')
-                else goNext()
-              }}
-              className="rounded-[1.6rem] bg-gradient-to-r from-sky-500 to-indigo-500 px-6 py-3 text-base font-extrabold text-white shadow-sm"
-            >
-              {setup.mode === 'adaptive' ? (currentIndex >= totalQuestions - 1 ? 'Submit' : 'Next') : currentIndex >= questions.length - 1 ? 'Submit' : 'Next'}
-            </button>
-          </div>
-
-          <div className="mt-5">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-xs font-semibold text-slate-500">Questions</div>
-              <div className="text-[11px] font-semibold text-slate-400">
-                Answered/Review progress
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {Array.from({ length: setup.numberOfQuestions }).map((_, i) => {
-                const q = questions[i]
-                const answered = q ? answersById[q.id] != null : false
-                const review = q ? !!markedForReview[q.id] : false
-                const isActive = i === currentIndex
-                const isGenerated = !!q
-                return (
-                  <button
-                    key={i}
-                    type="button"
-                    disabled={!isGenerated}
-                    onClick={() => goToIndex(i)}
-                    className={[
-                      'h-10 w-10 rounded-[1.6rem] text-base font-bold ring-1 transition',
-                      isActive ? 'bg-indigo-600 text-white ring-indigo-600' : '',
-                      answered ? 'bg-emerald-600 text-white ring-emerald-600' : '',
-                      review && !answered ? 'bg-[#A855F7] text-white ring-[#A855F7]' : '',
-                      !isGenerated ? 'cursor-not-allowed bg-slate-100 text-slate-400 ring-slate-200 opacity-70' : 'bg-white text-slate-700 ring-slate-200 hover:bg-slate-50',
-                    ].join(' ')}
-                  >
-                    {i + 1}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
+      {/* Sticky action bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200/90 bg-white/95 px-4 py-3 shadow-[0_-8px_30px_rgba(15,23,42,0.08)] backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={goPrev}
+            disabled={currentIndex === 0}
+            className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 shadow-sm disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          >
+            Previous
+          </button>
+          <button
+            type="button"
+            onClick={toggleReview}
+            className={[
+              'rounded-xl px-4 py-2.5 text-sm font-bold ring-1 transition',
+              markedForReview[currentQuestion.id]
+                ? 'bg-violet-600 text-white ring-violet-600'
+                : 'border border-slate-200 bg-white text-slate-700 ring-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200',
+            ].join(' ')}
+          >
+            {markedForReview[currentQuestion.id] ? 'Marked' : 'Mark review'}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const isLast = currentIndex >= (setup.mode === 'adaptive' ? totalQuestions - 1 : questions.length - 1)
+              if (setup.mode !== 'adaptive' && isLast) void submit('finished')
+              else goNext()
+            }}
+            className="ml-auto rounded-xl bg-gradient-to-r from-[#845adf] to-indigo-600 px-6 py-2.5 text-sm font-extrabold uppercase tracking-wide text-white shadow-lg shadow-[#845adf]/25"
+          >
+            {setup.mode === 'adaptive'
+              ? currentIndex >= totalQuestions - 1
+                ? 'Submit'
+                : 'Next'
+              : currentIndex >= questions.length - 1
+                ? 'Submit'
+                : 'Next'}
+          </button>
         </div>
       </div>
     </div>

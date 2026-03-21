@@ -37,113 +37,110 @@ export default function ReviewPage() {
 
   if (!attempt || !question) {
     return (
-      <div className="mx-auto w-full max-w-3xl px-4 py-10">
-        <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-100/70">
-          No attempt found. Please start a quiz again.
-        </div>
+      <div className="relative z-10 flex min-h-[40vh] items-center justify-center px-4 py-16">
+        <p className="rounded-2xl border border-slate-200/90 bg-white/95 px-8 py-6 text-sm font-semibold text-slate-600 shadow-card dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+          No attempt found. Start a quiz first.
+        </p>
       </div>
     )
   }
 
   return (
-    <div className="flex-1 px-1 sm:px-4">
-      <div className="mx-auto w-full max-w-3xl py-5 sm:py-6">
-        <div className="rounded-3xl bg-white p-4 sm:p-5 shadow-sm ring-1 ring-slate-100/70">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                Review
-              </div>
-              <h1 className="mt-1 text-2xl font-extrabold text-slate-900">
-                Answer Review
-              </h1>
-              <div className="mt-1 text-sm text-slate-600">
-                {attempt.setup.subjectName} • {attempt.setup.mode}
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => navigate('/')}
-              className="rounded-3xl bg-white px-4 py-2 text-sm font-extrabold text-slate-800 ring-1 ring-slate-200 transition hover:bg-slate-50"
-            >
-              Home
-            </button>
+    <div className="relative z-10 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-6">
+        <header className="flex flex-col gap-4 border-b border-slate-200/80 pb-6 dark:border-slate-800 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Review</p>
+            <h1 className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">Answer review</h1>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+              {attempt.setup.subjectName} • {attempt.setup.mode}
+            </p>
           </div>
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="w-fit rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+          >
+            Home
+          </button>
+        </header>
 
-          <div className="mt-4 flex items-center justify-between gap-3">
-            <div className="text-xs font-bold text-slate-500">
-              Question {activeIndex + 1} / {attempt.questions.length}
+        <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+          <span className="font-bold text-slate-700 dark:text-slate-200">
+            Question {activeIndex + 1} / {attempt.questions.length}
+          </span>
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+            {question.topicName}
+          </span>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-12">
+          <section className="lg:col-span-7">
+            <div className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-card dark:border-slate-800 dark:bg-slate-900 sm:p-8">
+              <p className="text-sm font-bold leading-relaxed text-slate-900 dark:text-white">{question.question}</p>
+              {question.explanation ? (
+                <div className="mt-6 rounded-xl border border-slate-100 bg-slate-50/90 p-4 dark:border-slate-800 dark:bg-slate-800/50">
+                  <div className="text-xs font-bold uppercase tracking-wide text-slate-500">Explanation</div>
+                  <p className="mt-2 text-sm font-medium text-slate-700 dark:text-slate-300">{question.explanation}</p>
+                </div>
+              ) : null}
             </div>
-            <div className="text-xs font-semibold text-slate-500">
-              {question.topicName}
-            </div>
-          </div>
-
-          <div className="mt-4 rounded-[1.8rem] bg-slate-50 p-4 ring-1 ring-slate-100">
-            <div className="text-sm font-bold text-slate-900">{question.question}</div>
-
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-[1.4rem] bg-white p-3 ring-1 ring-slate-100">
-                <div className="text-xs font-semibold text-slate-500">Your answer</div>
+          </section>
+          <section className="lg:col-span-5">
+            <div className="grid gap-4">
+              <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-card dark:border-slate-800 dark:bg-slate-900">
+                <div className="text-xs font-bold uppercase tracking-wide text-slate-500">Your answer</div>
                 <div
                   className={[
-                    'mt-1 text-sm font-extrabold',
-                    a === null ? 'text-amber-700' : correct ? 'text-emerald-700' : 'text-rose-700',
+                    'mt-2 text-lg font-extrabold',
+                    a === null ? 'text-amber-600' : correct ? 'text-emerald-600' : 'text-rose-600',
                   ].join(' ')}
                 >
                   {formatAnswer(question, a)}
                 </div>
               </div>
-              <div className="rounded-[1.4rem] bg-white p-3 ring-1 ring-slate-100">
-                <div className="text-xs font-semibold text-slate-500">Correct answer</div>
-                <div className="mt-1 text-sm font-extrabold text-sky-800">
+              <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-card dark:border-slate-800 dark:bg-slate-900">
+                <div className="text-xs font-bold uppercase tracking-wide text-slate-500">Correct answer</div>
+                <div className="mt-2 text-lg font-extrabold text-sky-700 dark:text-sky-300">
                   {formatAnswer(question, question.answer as AnswerValue)}
                 </div>
               </div>
             </div>
-
-            {question.explanation ? (
-              <div className="mt-4 rounded-[1.4rem] bg-white p-3 ring-1 ring-slate-100">
-                <div className="text-xs font-semibold text-slate-500">Explanation</div>
-                <div className="mt-1 text-sm font-semibold text-slate-700">{question.explanation}</div>
-              </div>
-            ) : null}
-          </div>
-
-          <div className="mt-5">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-sm font-bold text-slate-900">All Questions</div>
-              <div className="text-[11px] font-semibold text-slate-500">Tap a number to jump</div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {navigator.map((n) => {
-                const isActive = n.i === activeIndex
-                const base =
-                  n.review
-                    ? 'bg-[#A855F7] text-white ring-[#A855F7]'
-                    : n.answered
-                      ? n.ok
-                        ? 'bg-emerald-600 text-white ring-emerald-600'
-                        : 'bg-rose-600 text-white ring-rose-600'
-                      : 'bg-slate-200 text-slate-600 ring-slate-200'
-                return (
-                  <button
-                    key={n.i}
-                    type="button"
-                    onClick={() => setActiveIndex(n.i)}
-                    className={[
-                      'h-10 w-10 rounded-2xl text-sm font-extrabold ring-1 transition',
-                      base,
-                      isActive ? 'ring-2 ring-slate-900' : '',
-                    ].join(' ')}
-                  >
-                    {n.i + 1}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
+          </section>
         </div>
+
+        <section className="rounded-2xl border border-slate-200/90 bg-white/90 p-4 dark:border-slate-800 dark:bg-slate-900/80">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="text-sm font-bold text-slate-900 dark:text-white">All questions</span>
+            <span className="text-[11px] font-semibold text-slate-500">Tap to jump</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {navigator.map((n) => {
+              const isActive = n.i === activeIndex
+              const base = n.review
+                ? 'bg-violet-600 text-white ring-violet-600'
+                : n.answered
+                  ? n.ok
+                    ? 'bg-emerald-600 text-white ring-emerald-600'
+                    : 'bg-rose-600 text-white ring-rose-600'
+                  : 'bg-slate-200 text-slate-700 ring-slate-200 dark:bg-slate-700 dark:text-slate-100'
+              return (
+                <button
+                  key={n.i}
+                  type="button"
+                  onClick={() => setActiveIndex(n.i)}
+                  className={[
+                    'h-10 min-w-[2.5rem] rounded-xl text-sm font-extrabold ring-1 transition',
+                    base,
+                    isActive ? 'ring-2 ring-[#845adf] ring-offset-2 dark:ring-offset-slate-900' : '',
+                  ].join(' ')}
+                >
+                  {n.i + 1}
+                </button>
+              )
+            })}
+          </div>
+        </section>
       </div>
     </div>
   )

@@ -29,9 +29,10 @@ export default function ResultPage() {
 
   if (!attempt || !summary) {
     return (
-      <div className="mx-auto w-full max-w-3xl px-4 py-10">
-        <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-100/70">
-          No attempt found. Please start a quiz again.
+      <div className="relative z-10 flex min-h-[40vh] items-center justify-center px-4 py-16">
+        <div className="max-w-md rounded-2xl border border-slate-200/90 bg-white/95 p-8 text-center shadow-card dark:border-slate-800 dark:bg-slate-900">
+          <p className="text-lg font-bold text-slate-900 dark:text-white">No attempt found</p>
+          <p className="mt-2 text-sm text-slate-500">Start a quiz from home or setup to see results here.</p>
         </div>
       </div>
     )
@@ -41,100 +42,89 @@ export default function ResultPage() {
   const weakTopics = [...attempt.perTopic].sort((a, b) => a.percent - b.percent).slice(0, 5)
 
   return (
-    <div className="flex-1 px-1 sm:px-4">
-      <div className="mx-auto w-full max-w-3xl py-5 sm:py-6">
-        <div className="rounded-3xl bg-white p-4 sm:p-5 shadow-sm ring-1 ring-slate-100/70">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                Result
-              </div>
-              <h1 className="mt-1 text-2xl font-extrabold text-slate-900">Quiz completed</h1>
-              <div className="mt-1 text-sm text-slate-600">
-                {attempt.setup.subjectName}
-                {attempt.questions[0]?.topicName ? ` • ${attempt.questions[0].topicName}` : ''}
-              </div>
-            </div>
-
-            <div className="text-right">
-              <div className="rounded-3xl bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-4 text-white shadow-sm">
-                <div className="text-xs font-semibold uppercase tracking-wide opacity-80">Score</div>
-                <div className="mt-1 text-3xl font-extrabold">{attempt.score.percent}%</div>
-                <div className="mt-1 text-xs font-semibold opacity-90">
-                  {attempt.score.correct}/{attempt.score.total} correct
-                </div>
+    <div className="relative z-10 px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl space-y-6">
+        <div className="grid gap-6 lg:grid-cols-12 lg:items-stretch">
+          <div className="lg:col-span-7">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Result</p>
+            <h1 className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">Quiz completed</h1>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+              {attempt.setup.subjectName}
+              {attempt.questions[0]?.topicName ? ` • ${attempt.questions[0].topicName}` : ''}
+            </p>
+            <p className="mt-4 text-xs text-slate-500">Time taken: {attempt.timeTakenSeconds}s</p>
+          </div>
+          <div className="lg:col-span-5">
+            <div className="h-full rounded-2xl bg-gradient-to-br from-[#845adf] to-indigo-700 p-6 text-white shadow-card-lg">
+              <div className="text-xs font-bold uppercase tracking-wide text-white/80">Score</div>
+              <div className="mt-2 text-5xl font-black tabular-nums">{attempt.score.percent}%</div>
+              <div className="mt-2 text-sm font-semibold text-white/90">
+                {attempt.score.correct}/{attempt.score.total} correct
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="mt-5 grid grid-cols-3 gap-3">
-            <div className="rounded-[1.4rem] bg-emerald-50 p-4 ring-1 ring-emerald-100">
-              <div className="text-xs font-semibold text-emerald-700">Correct</div>
-              <div className="mt-1 text-2xl font-extrabold text-emerald-800">{correct}</div>
-            </div>
-            <div className="rounded-[1.4rem] bg-rose-50 p-4 ring-1 ring-rose-100">
-              <div className="text-xs font-semibold text-rose-700">Wrong</div>
-              <div className="mt-1 text-2xl font-extrabold text-rose-800">{wrong}</div>
-            </div>
-            <div className="rounded-[1.4rem] bg-amber-50 p-4 ring-1 ring-amber-100">
-              <div className="text-xs font-semibold text-amber-700">Skipped</div>
-              <div className="mt-1 text-2xl font-extrabold text-amber-800">{skipped}</div>
-            </div>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/90 p-5 dark:border-emerald-900/40 dark:bg-emerald-950/30">
+            <div className="text-xs font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">Correct</div>
+            <div className="mt-2 text-3xl font-black text-emerald-800 dark:text-emerald-200">{correct}</div>
           </div>
+          <div className="rounded-2xl border border-rose-200/80 bg-rose-50/90 p-5 dark:border-rose-900/40 dark:bg-rose-950/30">
+            <div className="text-xs font-bold uppercase tracking-wide text-rose-700 dark:text-rose-400">Wrong</div>
+            <div className="mt-2 text-3xl font-black text-rose-800 dark:text-rose-200">{wrong}</div>
+          </div>
+          <div className="rounded-2xl border border-amber-200/80 bg-amber-50/90 p-5 dark:border-amber-900/40 dark:bg-amber-950/30">
+            <div className="text-xs font-bold uppercase tracking-wide text-amber-800 dark:text-amber-300">Skipped</div>
+            <div className="mt-2 text-3xl font-black text-amber-900 dark:text-amber-100">{skipped}</div>
+          </div>
+        </div>
 
-          <div className="mt-5 rounded-[1.6rem] bg-slate-50 p-4 ring-1 ring-slate-100">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-bold text-slate-900">Weak Topics</div>
-              <div className="text-xs font-semibold text-slate-500">
-                Based on accuracy
-              </div>
-            </div>
-
-            <div className="mt-3 space-y-3">
-              {weakTopics.length === 0 ? (
-                <div className="text-sm text-slate-600">No topic data available.</div>
-              ) : (
-                weakTopics.map((t) => (
-                  <div
-                    key={t.topicName}
-                    className="rounded-[1.2rem] bg-white p-3 ring-1 ring-slate-100"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm font-semibold text-slate-800">{t.topicName}</div>
-                      <div className="text-xs font-bold text-slate-900">{t.percent}%</div>
-                    </div>
-                    <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-rose-500 to-amber-400"
-                        style={{ width: `${t.percent}%` }}
-                      />
-                    </div>
+        <section className="rounded-2xl border border-slate-200/90 bg-white/95 p-6 shadow-card dark:border-slate-800 dark:bg-slate-900">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white">Weak topics</h2>
+            <span className="text-xs font-semibold text-slate-500">By accuracy</span>
+          </div>
+          <div className="mt-4 space-y-3">
+            {weakTopics.length === 0 ? (
+              <p className="text-sm text-slate-600 dark:text-slate-400">No topic data available.</p>
+            ) : (
+              weakTopics.map((t) => (
+                <div
+                  key={t.topicName}
+                  className="rounded-xl border border-slate-100 bg-slate-50/90 p-4 dark:border-slate-800 dark:bg-slate-800/50"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{t.topicName}</span>
+                    <span className="text-sm font-black text-[#845adf]">{t.percent}%</span>
                   </div>
-                ))
-              )}
-            </div>
+                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-rose-500 to-amber-400"
+                      style={{ width: `${t.percent}%` }}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
+        </section>
 
-          <div className="mt-6 flex gap-3">
-            <button
-              type="button"
-              onClick={() => navigate('/review')}
-              className="flex-1 rounded-3xl bg-slate-900 px-4 py-3 text-sm font-extrabold text-white shadow-sm transition hover:bg-slate-800"
-            >
-              Review Answers
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/')}
-              className="rounded-3xl bg-white px-4 py-3 text-sm font-extrabold text-slate-800 ring-1 ring-slate-200 transition hover:bg-slate-50"
-            >
-              Home
-            </button>
-          </div>
-
-          <div className="mt-3 text-xs text-slate-500">
-            Time taken: {attempt.timeTakenSeconds}s
-          </div>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <button
+            type="button"
+            onClick={() => navigate('/review')}
+            className="flex-1 rounded-2xl bg-slate-900 px-4 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white shadow-lg transition hover:bg-slate-800 dark:bg-white dark:text-slate-900"
+          >
+            Review answers
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-extrabold text-slate-800 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+          >
+            Home
+          </button>
         </div>
       </div>
     </div>
