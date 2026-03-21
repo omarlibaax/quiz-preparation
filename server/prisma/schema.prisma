@@ -22,6 +22,17 @@ enum UserStatus {
   SUSPENDED
 }
 
+enum QuestionType {
+  MCQ
+  TF
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
 model User {
   id           Int        @id @default(autoincrement())
   fullName     String
@@ -33,6 +44,10 @@ model User {
   updatedAt    DateTime   @updatedAt
 
   refreshTokens RefreshToken[]
+  attempts      Attempt[]
+  bookmarks     Bookmark[]
+  createdExams  Exam[]       @relation("ExamCreatedBy")
+  createdQuestions Question[] @relation("QuestionCreatedBy")
 }
 
 model RefreshToken {
@@ -55,6 +70,7 @@ model Subject {
   updatedAt DateTime @updatedAt
 
   topics Topic[]
+  exams  Exam[]
 }
 
 model Topic {
@@ -65,7 +81,128 @@ model Topic {
   updatedAt DateTime @updatedAt
 
   subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  questions Question[]
 
   @@unique([subjectId, name])
   @@index([subjectId])
+}
+
+model Question {
+  id          Int          @id @default(autoincrement())
+  topicId     Int
+  type        QuestionType
+  questionText String      @db.Text
+  difficulty  Difficulty
+  explanation String?      @db.Text
+  createdById Int?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  topic       Topic        @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  createdBy   User?        @relation("QuestionCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  options     QuestionOption[]
+  examLinks   ExamQuestion[]
+  attemptAnswers AttemptAnswer[]
+  bookmarks   Bookmark[]
+
+  @@index([topicId])
+  @@index([difficulty])
+}
+
+model QuestionOption {
+  id          Int      @id @default(autoincrement())
+  questionId  Int
+  optionText  String   @db.Text
+  isCorrect   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedInAnswers AttemptAnswer[]
+
+  @@index([questionId])
+}
+
+model Exam {
+  id              Int      @id @default(autoincrement())
+  title           String
+  subjectId       Int
+  durationMinutes Int
+  totalQuestions  Int
+  isPublished     Boolean  @default(false)
+  createdById     Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  subject         Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  createdBy       User?    @relation("ExamCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  questions       ExamQuestion[]
+  attempts        Attempt[]
+
+  @@index([subjectId])
+}
+
+model ExamQuestion {
+  id         Int      @id @default(autoincrement())
+  examId     Int
+  questionId Int
+  orderNo    Int
+  createdAt  DateTime @default(now())
+
+  exam       Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([examId, orderNo])
+  @@unique([examId, questionId])
+  @@index([examId])
+  @@index([questionId])
+}
+
+model Attempt {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  examId        Int
+  startedAt     DateTime @default(now())
+  submittedAt   DateTime?
+  correctCount  Int      @default(0)
+  wrongCount    Int      @default(0)
+  skippedCount  Int      @default(0)
+  scorePercent  Float    @default(0)
+  createdAt     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exam          Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  answers       AttemptAnswer[]
+
+  @@index([userId])
+  @@index([examId])
+}
+
+model AttemptAnswer {
+  id               Int      @id @default(autoincrement())
+  attemptId        Int
+  questionId       Int
+  selectedOptionId Int?
+  selectedBoolean  Boolean?
+  isCorrect        Boolean  @default(false)
+  createdAt        DateTime @default(now())
+
+  attempt          Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question         Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedOption   QuestionOption? @relation(fields: [selectedOptionId], references: [id], onDelete: SetNull)
+
+  @@index([attemptId])
+  @@index([questionId])
+}
+
+model Bookmark {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  questionId Int
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId])
+  @@index([questionId])
 }

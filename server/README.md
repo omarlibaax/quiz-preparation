@@ -28,6 +28,15 @@ API base: `http://localhost:4000`
 - `GET /api/subjects`
 - `POST /api/subjects` (ADMIN)
 - `POST /api/subjects/topics` (ADMIN)
+- `GET /api/questions`
+- `POST /api/questions` (ADMIN)
+- `GET /api/exams`
+- `GET /api/exams/:id`
+- `POST /api/exams` (ADMIN)
+- `PATCH /api/exams/:id/publish` (ADMIN)
+- `POST /api/attempts/start` (AUTH)
+- `POST /api/attempts/:attemptId/submit` (AUTH)
+- `GET /api/attempts/:attemptId` (AUTH)
 
 ## Optional Docker
 
