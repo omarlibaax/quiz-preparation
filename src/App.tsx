@@ -26,6 +26,9 @@ export default function App() {
     <>
       <Toaster position="top-right" toastOptions={{ duration: 3500 }} />
       <Routes>
+        {/* Bare /admin → /admin/dashboard (must log in; RequireAdmin on nested layout) */}
+        <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+
         <Route
           path="/admin/*"
           element={
