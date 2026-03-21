@@ -89,3 +89,25 @@ export type ApiAttemptResult = {
   }>
 }
 
+export type ApiStudentDashboard = {
+  totalAttempts: number
+  averageScore: number
+  weakTopics: Array<{
+    topicId: number
+    topicName: string
+    totalQuestions: number
+    accuracyPercent: number
+  }>
+  recentAttempts: Array<{
+    attemptId: number
+    examId: number
+    examTitle: string
+    subjectName: string
+    scorePercent: number
+    correctCount: number
+    wrongCount: number
+    skippedCount: number
+    submittedAt: string | null
+  }>
+}
+

@@ -4,7 +4,8 @@ import { listSubjects, listTopicsForSubject } from '../utils/questionBank'
 import type { Difficulty, QuizMode, QuestionType, QuizSetup } from '../types/quiz'
 import { writeJson, readJson } from '../utils/storage'
 import { fetchSubjects } from '../services/subjectsApi'
-import type { ApiSubject } from '../types/api'
+import { listPublishedExamsBySubject } from '../services/examsApi'
+import type { ApiExam, ApiSubject } from '../types/api'
 
 function useQuery() {
   const { search } = useLocation()
@@ -65,13 +66,42 @@ export default function SetupPage() {
   const [difficulty, setDifficulty] = useState<Difficulty | 'mixed'>(initialPrefs.difficulty)
   const [questionType, setQuestionType] = useState<QuestionType | 'mixed'>(initialPrefs.questionType)
   const [mode, setMode] = useState<QuizMode>(initialPrefs.mode)
+  const [publishedExams, setPublishedExams] = useState<ApiExam[]>([])
+  const [selectedExamId, setSelectedExamId] = useState<number | undefined>(undefined)
 
   const canStart = subjectName.length > 0 && numberOfQuestions > 0
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      if (!subjectName) {
+        setPublishedExams([])
+        setSelectedExamId(undefined)
+        return
+      }
+      try {
+        const exams = await listPublishedExamsBySubject(subjectName)
+        if (!cancelled) {
+          setPublishedExams(exams)
+          setSelectedExamId(exams[0]?.id)
+        }
+      } catch {
+        if (!cancelled) {
+          setPublishedExams([])
+          setSelectedExamId(undefined)
+        }
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [subjectName])
 
   function start() {
     if (!canStart) return
     const setup: QuizSetup = {
       subjectName,
+      examId: selectedExamId,
       numberOfQuestions,
       timeLimitSeconds: mode === 'practice' ? null : timeLimitSeconds ?? 10 * 60,
       difficulty,
@@ -116,6 +146,31 @@ export default function SetupPage() {
         <div className="space-y-4 p-5 sm:p-6 md:p-7">
 
           <div className="mt-5 space-y-4">
+          {publishedExams.length > 0 ? (
+            <div className="rounded-3xl bg-white p-5">
+              <label className="text-sm font-semibold text-slate-700">Published exam</label>
+              <div className="mt-2 grid gap-2">
+                {publishedExams.map((exam) => (
+                  <button
+                    key={exam.id}
+                    type="button"
+                    onClick={() => setSelectedExamId(exam.id)}
+                    className={[
+                      'rounded-xl border px-3 py-3 text-left transition',
+                      selectedExamId === exam.id
+                        ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-200'
+                        : 'border-slate-200 bg-white hover:bg-slate-50',
+                    ].join(' ')}
+                  >
+                    <div className="text-sm font-bold text-slate-900">{exam.title}</div>
+                    <div className="text-xs text-slate-500">
+                      {exam.totalQuestions} questions • {exam.durationMinutes} min
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
 
           {canPickTopic ? (
             <div className="rounded-3xl bg-white p-5">

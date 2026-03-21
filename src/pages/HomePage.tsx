@@ -76,6 +76,12 @@ export default function HomePage() {
         <div>
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
+              <Link
+                to="/dashboard"
+                className="rounded-xl bg-indigo-50 px-3 py-2 text-xs font-semibold text-indigo-700 ring-1 ring-indigo-200 transition hover:bg-indigo-100"
+              >
+                Dashboard
+              </Link>
               <div className="hidden text-xs font-semibold text-slate-500 sm:block">{user?.fullName}</div>
               <button
                 type="button"

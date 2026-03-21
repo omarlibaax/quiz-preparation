@@ -40,6 +40,7 @@ export type QuizMode = 'practice' | 'timed' | 'adaptive'
 
 export type QuizSetup = {
   subjectName: string
+  examId?: number
   topicName?: string
   numberOfQuestions: number
   timeLimitSeconds: number | null

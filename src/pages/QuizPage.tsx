@@ -85,7 +85,9 @@ export default function QuizPage() {
       if (!setup || !tokens?.accessToken) return
       try {
         const exams = await listPublishedExams()
-        const exam = exams.find((e) => e.subject.name.toLowerCase() === setup.subjectName.toLowerCase())
+        const exam = setup.examId
+          ? exams.find((e) => e.id === setup.examId)
+          : exams.find((e) => e.subject.name.toLowerCase() === setup.subjectName.toLowerCase())
         if (!exam) return
 
         const started = await startAttempt(exam.id, tokens.accessToken)
