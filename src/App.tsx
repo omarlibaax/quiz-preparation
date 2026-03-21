@@ -1,7 +1,9 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import RequireAuth from './components/RequireAuth'
+import RequireAdmin from './components/RequireAdmin'
 import HomePage from './pages/HomePage'
 import AuthPage from './pages/AuthPage'
+import AdminPanelPage from './pages/AdminPanelPage'
 import DashboardPage from './pages/DashboardPage'
 import SetupPage from './pages/SetupPage'
 import QuizPage from './pages/QuizPage'
@@ -17,6 +19,14 @@ export default function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/auth" element={<AuthPage />} />
+              <Route
+                path="/admin"
+                element={
+                  <RequireAdmin>
+                    <AdminPanelPage />
+                  </RequireAdmin>
+                }
+              />
               <Route
                 path="/dashboard"
                 element={

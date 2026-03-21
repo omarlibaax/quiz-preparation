@@ -82,6 +82,14 @@ export default function HomePage() {
               >
                 Dashboard
               </Link>
+              {user?.role === 'ADMIN' ? (
+                <Link
+                  to="/admin"
+                  className="rounded-xl bg-violet-50 px-3 py-2 text-xs font-semibold text-violet-700 ring-1 ring-violet-200 transition hover:bg-violet-100"
+                >
+                  Admin
+                </Link>
+              ) : null}
               <div className="hidden text-xs font-semibold text-slate-500 sm:block">{user?.fullName}</div>
               <button
                 type="button"
