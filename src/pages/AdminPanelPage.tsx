@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { createSubject, createTopic } from '../services/adminApi'
+import { createQuestion, createSubject, createTopic } from '../services/adminApi'
 import { listAllExams, setExamPublished } from '../services/examsApi'
 import { fetchSubjects } from '../services/subjectsApi'
 import type { ApiExam, ApiSubject } from '../types/api'
@@ -13,7 +13,16 @@ export default function AdminPanelPage() {
   const [subjectName, setSubjectName] = useState('')
   const [topicName, setTopicName] = useState('')
   const [topicSubjectId, setTopicSubjectId] = useState<number | ''>('')
+  const [questionTopicId, setQuestionTopicId] = useState<number | ''>('')
+  const [questionType, setQuestionType] = useState<'MCQ' | 'TF'>('MCQ')
+  const [questionDifficulty, setQuestionDifficulty] = useState<'EASY' | 'MEDIUM' | 'HARD'>('MEDIUM')
+  const [questionText, setQuestionText] = useState('')
+  const [questionExplanation, setQuestionExplanation] = useState('')
+  const [mcqOptions, setMcqOptions] = useState(['', '', '', ''])
+  const [mcqCorrectIndex, setMcqCorrectIndex] = useState(0)
+  const [tfCorrect, setTfCorrect] = useState(true)
   const [status, setStatus] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   async function loadAll() {
     const [s, e] = await Promise.all([fetchSubjects(), listAllExams()])
@@ -27,25 +36,88 @@ export default function AdminPanelPage() {
 
   async function onCreateSubject() {
     if (!tokens?.accessToken || !subjectName.trim()) return
-    await createSubject(subjectName.trim(), tokens.accessToken)
-    setSubjectName('')
-    setStatus('Subject created')
-    await loadAll()
+    try {
+      await createSubject(subjectName.trim(), tokens.accessToken)
+      setSubjectName('')
+      setStatus('Subject created')
+      setError(null)
+      await loadAll()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to create subject')
+    }
   }
 
   async function onCreateTopic() {
     if (!tokens?.accessToken || !topicName.trim() || !topicSubjectId) return
-    await createTopic(Number(topicSubjectId), topicName.trim(), tokens.accessToken)
-    setTopicName('')
-    setStatus('Topic created')
-    await loadAll()
+    try {
+      await createTopic(Number(topicSubjectId), topicName.trim(), tokens.accessToken)
+      setTopicName('')
+      setStatus('Topic created')
+      setError(null)
+      await loadAll()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to create topic')
+    }
   }
 
   async function onTogglePublish(exam: ApiExam) {
     if (!tokens?.accessToken) return
-    await setExamPublished(exam.id, !exam.isPublished, tokens.accessToken)
-    setStatus(`Exam ${!exam.isPublished ? 'published' : 'unpublished'}`)
-    await loadAll()
+    try {
+      await setExamPublished(exam.id, !exam.isPublished, tokens.accessToken)
+      setStatus(`Exam ${!exam.isPublished ? 'published' : 'unpublished'}`)
+      setError(null)
+      await loadAll()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to update exam publish state')
+    }
+  }
+
+  async function onCreateQuestion() {
+    if (!tokens?.accessToken || !questionTopicId || questionText.trim().length < 5) return
+    try {
+      if (questionType === 'MCQ') {
+        const normalized = mcqOptions.map((o) => o.trim())
+        if (normalized.some((o) => !o)) {
+          setError('All MCQ options are required')
+          return
+        }
+        await createQuestion(
+          {
+            topicId: Number(questionTopicId),
+            type: 'MCQ',
+            questionText: questionText.trim(),
+            difficulty: questionDifficulty,
+            explanation: questionExplanation.trim() || undefined,
+            options: normalized.map((optionText, idx) => ({
+              optionText,
+              isCorrect: idx === mcqCorrectIndex,
+            })),
+          },
+          tokens.accessToken,
+        )
+      } else {
+        await createQuestion(
+          {
+            topicId: Number(questionTopicId),
+            type: 'TF',
+            questionText: questionText.trim(),
+            difficulty: questionDifficulty,
+            explanation: questionExplanation.trim() || undefined,
+            correctBoolean: tfCorrect,
+          },
+          tokens.accessToken,
+        )
+      }
+      setQuestionText('')
+      setQuestionExplanation('')
+      setMcqOptions(['', '', '', ''])
+      setMcqCorrectIndex(0)
+      setTfCorrect(true)
+      setStatus('Question created')
+      setError(null)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to create question')
+    }
   }
 
   return (
@@ -60,6 +132,7 @@ export default function AdminPanelPage() {
 
       <div className="space-y-4">
         {status ? <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">{status}</div> : null}
+        {error ? <div className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</div> : null}
 
         <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80">
           <h2 className="text-sm font-bold text-slate-900">Create Subject</h2>
@@ -125,6 +198,113 @@ export default function AdminPanelPage() {
             ))}
             {exams.length === 0 ? <div className="text-sm text-slate-500">No exams found.</div> : null}
           </div>
+        </section>
+
+        <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80">
+          <h2 className="text-sm font-bold text-slate-900">Create Question</h2>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <select
+              value={questionTopicId}
+              onChange={(e) => setQuestionTopicId(e.target.value ? Number(e.target.value) : '')}
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            >
+              <option value="">Select topic</option>
+              {subjects.flatMap((s) =>
+                s.topics.map((t) => (
+                  <option key={`${s.id}-${t.id}`} value={t.id}>
+                    {s.name} - {t.name}
+                  </option>
+                )),
+              )}
+            </select>
+            <select
+              value={questionType}
+              onChange={(e) => setQuestionType(e.target.value as 'MCQ' | 'TF')}
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            >
+              <option value="MCQ">MCQ</option>
+              <option value="TF">True/False</option>
+            </select>
+            <select
+              value={questionDifficulty}
+              onChange={(e) => setQuestionDifficulty(e.target.value as 'EASY' | 'MEDIUM' | 'HARD')}
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            >
+              <option value="EASY">Easy</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="HARD">Hard</option>
+            </select>
+            <input
+              value={questionExplanation}
+              onChange={(e) => setQuestionExplanation(e.target.value)}
+              placeholder="Explanation (optional)"
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            />
+          </div>
+
+          <textarea
+            value={questionText}
+            onChange={(e) => setQuestionText(e.target.value)}
+            placeholder="Question text"
+            className="mt-2 min-h-24 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+          />
+
+          {questionType === 'MCQ' ? (
+            <div className="mt-3 space-y-2">
+              {mcqOptions.map((option, idx) => (
+                <div key={idx} className="grid grid-cols-[1fr_auto] gap-2">
+                  <input
+                    value={option}
+                    onChange={(e) =>
+                      setMcqOptions((prev) => prev.map((p, i) => (i === idx ? e.target.value : p)))
+                    }
+                    placeholder={`Option ${idx + 1}`}
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setMcqCorrectIndex(idx)}
+                    className={[
+                      'rounded-xl px-3 py-2 text-xs font-bold',
+                      mcqCorrectIndex === idx ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700',
+                    ].join(' ')}
+                  >
+                    {mcqCorrectIndex === idx ? 'Correct' : 'Mark correct'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                onClick={() => setTfCorrect(true)}
+                className={[
+                  'rounded-xl px-3 py-2 text-xs font-bold',
+                  tfCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700',
+                ].join(' ')}
+              >
+                True is correct
+              </button>
+              <button
+                type="button"
+                onClick={() => setTfCorrect(false)}
+                className={[
+                  'rounded-xl px-3 py-2 text-xs font-bold',
+                  !tfCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700',
+                ].join(' ')}
+              >
+                False is correct
+              </button>
+            </div>
+          )}
+
+          <button
+            onClick={onCreateQuestion}
+            className="mt-3 rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white"
+          >
+            Create Question
+          </button>
         </section>
       </div>
     </div>

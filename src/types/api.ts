@@ -111,3 +111,12 @@ export type ApiStudentDashboard = {
   }>
 }
 
+export type ApiQuestion = {
+  id: number
+  topicId: number
+  type: 'MCQ' | 'TF'
+  questionText: string
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD'
+  explanation?: string | null
+}
+
