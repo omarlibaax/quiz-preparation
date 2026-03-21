@@ -39,10 +39,36 @@ API base: `http://localhost:4000`
 - `GET /api/attempts/:attemptId` (AUTH)
 - `GET /api/students/me/dashboard` (AUTH)
 - `POST /api/admin/import-question-bank` (ADMIN)
+- `POST /api/admin/bootstrap-admin` (public, one-time, requires bootstrap secret)
 
 ## Optional Docker
 
 If you do not want to use your Apache/MySQL installation, you can run:
 
 - `docker compose up -d`
+
+## First-time admin setup
+
+Use this endpoint once (before any admin exists):
+
+- `POST /api/admin/bootstrap-admin`
+
+Body:
+
+```json
+{
+  "fullName": "System Admin",
+  "email": "admin@example.com",
+  "password": "StrongPass123",
+  "bootstrapSecret": "replace-with-bootstrap-secret"
+}
+```
+
+## Import question bank via script
+
+After creating an admin user:
+
+- `npm run seed:import-bank` (default file and no clear)
+- `npm run seed:import-bank -- --clear` (clear previous question/exam data first)
+- `npm run seed:import-bank -- --file=../src/data/questions.json`
 
