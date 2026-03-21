@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { createQuestion, createSubject, createTopic } from '../services/adminApi'
-import { listAllExams, setExamPublished } from '../services/examsApi'
+import { createExam, listAllExams, setExamPublished } from '../services/examsApi'
+import { listQuestions } from '../services/questionsApi'
 import { fetchSubjects } from '../services/subjectsApi'
-import type { ApiExam, ApiSubject } from '../types/api'
+import type { ApiExam, ApiQuestionListItem, ApiSubject } from '../types/api'
 
 export default function AdminPanelPage() {
   const { tokens } = useAuth()
@@ -23,6 +24,18 @@ export default function AdminPanelPage() {
   const [tfCorrect, setTfCorrect] = useState(true)
   const [status, setStatus] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  const [examTitle, setExamTitle] = useState('')
+  const [examSubjectId, setExamSubjectId] = useState<number | ''>('')
+  const [examDurationMinutes, setExamDurationMinutes] = useState(30)
+  const [examTotalQuestions, setExamTotalQuestions] = useState(10)
+  const [examFilterTopicId, setExamFilterTopicId] = useState<number | ''>('')
+  const [examFilterDifficulty, setExamFilterDifficulty] = useState<'EASY' | 'MEDIUM' | 'HARD' | ''>('')
+  const [examFilterType, setExamFilterType] = useState<'MCQ' | 'TF' | ''>('')
+  const [examQuestionPool, setExamQuestionPool] = useState<ApiQuestionListItem[]>([])
+  const [examSelectedIds, setExamSelectedIds] = useState<number[]>([])
+  const [loadingExamQuestions, setLoadingExamQuestions] = useState(false)
+  const [publishExamAfterCreate, setPublishExamAfterCreate] = useState(false)
 
   async function loadAll() {
     const [s, e] = await Promise.all([fetchSubjects(), listAllExams()])
@@ -69,6 +82,99 @@ export default function AdminPanelPage() {
       await loadAll()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to update exam publish state')
+    }
+  }
+
+  const examTopicsForSubject = examSubjectId
+    ? subjects.find((s) => s.id === examSubjectId)?.topics ?? []
+    : []
+
+  function toggleExamQuestionId(id: number) {
+    setExamSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+  }
+
+  async function onLoadExamQuestions() {
+    if (!examSubjectId) {
+      setError('Select a subject for the exam first')
+      return
+    }
+    setLoadingExamQuestions(true)
+    setError(null)
+    try {
+      const sub = subjects.find((s) => s.id === examSubjectId)
+      if (!sub) return
+      const diff = examFilterDifficulty || undefined
+      const typ = examFilterType || undefined
+      let rows: ApiQuestionListItem[] = []
+      if (examFilterTopicId) {
+        rows = await listQuestions({
+          topicId: Number(examFilterTopicId),
+          difficulty: diff,
+          type: typ,
+          limit: 100,
+        })
+      } else {
+        const batches = await Promise.all(
+          sub.topics.map((t) =>
+            listQuestions({
+              topicId: t.id,
+              difficulty: diff,
+              type: typ,
+              limit: 100,
+            }),
+          ),
+        )
+        rows = batches.flat()
+        const seen = new Set<number>()
+        rows = rows.filter((q) => {
+          if (seen.has(q.id)) return false
+          seen.add(q.id)
+          return true
+        })
+      }
+      setExamQuestionPool(rows)
+      setExamSelectedIds([])
+      setStatus(`Loaded ${rows.length} question(s)`)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load questions')
+    } finally {
+      setLoadingExamQuestions(false)
+    }
+  }
+
+  async function onCreateExam() {
+    if (!tokens?.accessToken || !examSubjectId || !examTitle.trim()) return
+    if (examSelectedIds.length < examTotalQuestions) {
+      setError(`Select at least ${examTotalQuestions} question(s) in order (first ${examTotalQuestions} will be used).`)
+      return
+    }
+    try {
+      const questionIds = examSelectedIds.slice(0, examTotalQuestions)
+      const created = await createExam(
+        {
+          title: examTitle.trim(),
+          subjectId: Number(examSubjectId),
+          durationMinutes: examDurationMinutes,
+          totalQuestions: examTotalQuestions,
+          questionIds,
+        },
+        tokens.accessToken,
+      )
+      if (publishExamAfterCreate) {
+        await setExamPublished(created.id, true, tokens.accessToken)
+      }
+      setExamTitle('')
+      setExamQuestionPool([])
+      setExamSelectedIds([])
+      setStatus(
+        publishExamAfterCreate
+          ? `Exam created and published (id ${created.id})`
+          : `Exam created (id ${created.id})`,
+      )
+      setError(null)
+      await loadAll()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to create exam')
     }
   }
 
@@ -304,6 +410,147 @@ export default function AdminPanelPage() {
             className="mt-3 rounded-xl bg-violet-600 px-4 py-2 text-sm font-bold text-white"
           >
             Create Question
+          </button>
+        </section>
+
+        <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80">
+          <h2 className="text-sm font-bold text-slate-900">Create Exam</h2>
+          <p className="mt-1 text-xs text-slate-500">
+            Pick a subject, load questions (optionally filter by topic/type/difficulty), select at least as many as
+            &quot;Total questions&quot; — order matters; the first N selected are used.
+          </p>
+
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <input
+              value={examTitle}
+              onChange={(e) => setExamTitle(e.target.value)}
+              placeholder="Exam title"
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm sm:col-span-2"
+            />
+            <select
+              value={examSubjectId}
+              onChange={(e) => {
+                setExamSubjectId(e.target.value ? Number(e.target.value) : '')
+                setExamFilterTopicId('')
+                setExamQuestionPool([])
+                setExamSelectedIds([])
+              }}
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            >
+              <option value="">Subject</option>
+              {subjects.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+            <input
+              type="number"
+              min={1}
+              max={300}
+              value={examDurationMinutes}
+              onChange={(e) => setExamDurationMinutes(Number(e.target.value) || 1)}
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              placeholder="Duration (min)"
+            />
+            <input
+              type="number"
+              min={1}
+              max={300}
+              value={examTotalQuestions}
+              onChange={(e) => setExamTotalQuestions(Number(e.target.value) || 1)}
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              placeholder="Total questions"
+            />
+            <select
+              value={examFilterTopicId}
+              onChange={(e) => setExamFilterTopicId(e.target.value ? Number(e.target.value) : '')}
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm sm:col-span-2"
+              disabled={!examSubjectId}
+            >
+              <option value="">All topics in subject (or pick one)</option>
+              {examTopicsForSubject.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+            <select
+              value={examFilterDifficulty}
+              onChange={(e) => setExamFilterDifficulty(e.target.value as 'EASY' | 'MEDIUM' | 'HARD' | '')}
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            >
+              <option value="">Any difficulty</option>
+              <option value="EASY">Easy</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="HARD">Hard</option>
+            </select>
+            <select
+              value={examFilterType}
+              onChange={(e) => setExamFilterType(e.target.value as 'MCQ' | 'TF' | '')}
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            >
+              <option value="">Any type</option>
+              <option value="MCQ">MCQ</option>
+              <option value="TF">True/False</option>
+            </select>
+          </div>
+
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={onLoadExamQuestions}
+              disabled={loadingExamQuestions || !examSubjectId}
+              className="rounded-xl bg-slate-800 px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+            >
+              {loadingExamQuestions ? 'Loading…' : 'Load questions'}
+            </button>
+            <label className="flex items-center gap-2 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                checked={publishExamAfterCreate}
+                onChange={(e) => setPublishExamAfterCreate(e.target.checked)}
+              />
+              Publish after create
+            </label>
+          </div>
+
+          {examQuestionPool.length > 0 ? (
+            <div className="mt-3 max-h-64 overflow-y-auto rounded-xl border border-slate-200 p-2">
+              {examQuestionPool.map((q) => (
+                <label
+                  key={q.id}
+                  className="flex cursor-pointer gap-2 border-b border-slate-100 py-2 text-sm last:border-0"
+                >
+                  <input
+                    type="checkbox"
+                    checked={examSelectedIds.includes(q.id)}
+                    onChange={() => toggleExamQuestionId(q.id)}
+                  />
+                  <span className="flex-1">
+                    <span className="font-semibold text-slate-800">#{q.id}</span>{' '}
+                    <span className="text-slate-600">{q.questionText.slice(0, 120)}</span>
+                    <span className="block text-xs text-slate-400">
+                      {q.topic.subject.name} · {q.topic.name} · {q.type} · {q.difficulty}
+                    </span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          ) : null}
+
+          <div className="mt-2 text-xs text-slate-600">
+            Selected: {examSelectedIds.length} / need ≥ {examTotalQuestions} (uses first {examTotalQuestions} in
+            selection order)
+          </div>
+
+          <button
+            type="button"
+            onClick={onCreateExam}
+            disabled={!examTitle.trim() || !examSubjectId || examSelectedIds.length < examTotalQuestions}
+            className="mt-3 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Create exam
           </button>
         </section>
       </div>

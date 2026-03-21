@@ -120,3 +120,30 @@ export type ApiQuestion = {
   explanation?: string | null
 }
 
+/** Full row from GET /api/questions (includes topic + subject for admin picker) */
+export type ApiQuestionListItem = {
+  id: number
+  topicId: number
+  type: 'MCQ' | 'TF'
+  questionText: string
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD'
+  topic: {
+    id: number
+    name: string
+    subject: {
+      id: number
+      name: string
+    }
+  }
+}
+
+/** Response from POST /api/exams (minimal fields used by admin UI) */
+export type ApiCreatedExam = {
+  id: number
+  title: string
+  subjectId: number
+  durationMinutes: number
+  totalQuestions: number
+  isPublished: boolean
+}
+
