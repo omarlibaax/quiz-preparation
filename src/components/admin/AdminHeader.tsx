@@ -10,7 +10,7 @@ type Props = {
   userSubtitle?: string
 }
 
-export function AdminHeader({ onMenu, onToggleSidebar, userName, userSubtitle = 'Administrator' }: Props) {
+export function AdminHeader({ onMenu, onToggleSidebar, userName, userSubtitle = 'Admin panel' }: Props) {
   const toggleTheme = useThemeStore((s) => s.toggleTheme)
   const theme = useThemeStore((s) => s.theme)
   const toggleRightPanel = useAdminUiStore((s) => s.toggleRightPanel)

@@ -38,7 +38,7 @@ After this, refresh **phpMyAdmin** → `exam_platform` — you should see tables
 
 ## 4. Seed users + full question bank
 
-This creates **Super Admin**, **Admin**, and **Student** users and imports **`src/data/questions.json`** into **subjects, topics, questions** (same logic as Admin → Operations import).
+This creates **two admin-panel accounts** (same UI and access: roles `SUPER_ADMIN` and `ADMIN`), a **Student** user, and imports **`src/data/questions.json`** into **subjects, topics, questions** (same logic as Admin → Operations import).
 
 ```bash
 cd server
@@ -53,11 +53,11 @@ npm run db:seed
 
 **Default login (if you did not set `SEED_*` in `.env`):**
 
-| Role        | Email                 | Password      |
-|------------|------------------------|---------------|
-| Super Admin | `superadmin@exam.local` | `SuperAdmin123!` |
-| Admin      | `admin@exam.local`     | `Admin123!`   |
-| Student    | `student@exam.local`    | `Student123!` |
+| Role | Email | Password |
+|------|-------|----------|
+| **Admin panel** (use either account — same dashboard) | `superadmin@exam.local` | `SuperAdmin123!` |
+| | `admin@exam.local` | `Admin123!` |
+| Student | `student@exam.local` | `Student123!` |
 
 Override in `server/.env`:
 
@@ -97,7 +97,7 @@ The **admin UI** is the React app, not phpMyAdmin.
 
 1. Start API: `cd server && npm run dev` (default **http://localhost:4000**)
 2. Start frontend: `npm run dev` in project root (e.g. **http://localhost:5173**)
-3. Open **http://localhost:5173/admin/dashboard** and sign in with **Super Admin** or **Admin**.
+3. Open **http://localhost:5173/admin/dashboard** and sign in with either **admin-panel** account above (same experience).
 
 phpMyAdmin is only for **viewing/editing raw MySQL data**; the app is where you manage content day-to-day.
 

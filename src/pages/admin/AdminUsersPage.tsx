@@ -14,15 +14,20 @@ import { EmptyState } from '../../components/admin/EmptyState'
 import type { MockUserRow } from '../../data/adminDashboardMock'
 import { mockUsers } from '../../data/adminDashboardMock'
 import { cn } from '../../utils/cn'
+import { formatUserRoleLabel } from '../../utils/roles'
 
 export default function AdminUsersPage() {
   const [data, setData] = useState<MockUserRow[]>(() => [...mockUsers])
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
-  const [roleFilter, setRoleFilter] = useState<'all' | 'STUDENT' | 'ADMIN' | 'SUPER_ADMIN'>('all')
+  /** ADMIN + SUPER_ADMIN share the same admin panel — one filter for both. */
+  const [roleFilter, setRoleFilter] = useState<'all' | 'STUDENT' | 'admin_panel'>('all')
 
   const tableData = useMemo(() => {
     if (roleFilter === 'all') return data
+    if (roleFilter === 'admin_panel') {
+      return data.filter((u) => u.role === 'ADMIN' || u.role === 'SUPER_ADMIN')
+    }
     return data.filter((u) => u.role === roleFilter)
   }, [data, roleFilter])
 
@@ -30,7 +35,11 @@ export default function AdminUsersPage() {
     () => [
       { accessorKey: 'name', header: 'Name', cell: (info) => info.getValue() },
       { accessorKey: 'email', header: 'Email' },
-      { accessorKey: 'role', header: 'Role' },
+      {
+        accessorKey: 'role',
+        header: 'Role',
+        cell: (info) => formatUserRoleLabel(String(info.getValue())),
+      },
       {
         accessorKey: 'status',
         header: 'Status',
@@ -94,13 +103,12 @@ export default function AdminUsersPage() {
           className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"
           value={roleFilter}
           onChange={(e) =>
-            setRoleFilter(e.target.value as 'all' | 'STUDENT' | 'ADMIN' | 'SUPER_ADMIN')
+            setRoleFilter(e.target.value as 'all' | 'STUDENT' | 'admin_panel')
           }
         >
           <option value="all">All roles</option>
           <option value="STUDENT">Students</option>
-          <option value="ADMIN">Admins</option>
-          <option value="SUPER_ADMIN">Super admins</option>
+          <option value="admin_panel">Admin panel</option>
         </select>
       </div>
 

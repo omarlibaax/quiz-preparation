@@ -80,12 +80,11 @@ quiz-preparation/
 
 See **`docs/DATABASE_SEED.md`**: `DATABASE_URL` → `prisma db push` → `prisma db seed` (users + `questions.json` → subjects/topics/questions). phpMyAdmin is for inspecting tables; the **admin UI** is `/admin/dashboard` on the Vite app.
 
-## Super Admin user
+## Admin panel (`SUPER_ADMIN` & `ADMIN`)
 
-- **Role** `SUPER_ADMIN` in Prisma (`UserRole`) has the same API access as `ADMIN` (middleware `requireAdmin()`).
-- **Create** (with DB migrated): in `server/`, set `SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_PASSWORD` (min 8 chars), optional `SUPER_ADMIN_FULL_NAME` in `.env`, then run **`npm run create-super-admin`**.
-- **Existing user**: same command with **`--promote`** to set that email to `SUPER_ADMIN` (and update password from env).
-- **Bootstrap** (`POST /api/admin/bootstrap-admin`) still creates the first **`ADMIN`** if no `ADMIN` or `SUPER_ADMIN` exists.
+- **`SUPER_ADMIN` and `ADMIN` are the same in the app**: one **Admin panel** UI and the same admin API access (`requireAdmin()`).
+- **Create elevated user** (with DB migrated): in `server/`, set `SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_PASSWORD` (min 8 chars), optional `SUPER_ADMIN_FULL_NAME` in `.env`, then run **`npm run create-super-admin`** (creates `SUPER_ADMIN`; use **`--promote`** to promote an existing user).
+- **Bootstrap** (`POST /api/admin/bootstrap-admin`) creates the first **`ADMIN`** if no `ADMIN` or `SUPER_ADMIN` exists.
 
 ## Question bank (database)
 

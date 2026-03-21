@@ -55,7 +55,7 @@ export default function AdminDashboardLayout() {
           )}
         >
           {!collapsed ? (
-            <span className="truncate text-lg font-bold tracking-tight text-white">
+            <span className="truncate text-lg font-bold tracking-tight text-white" title="Admin panel">
               Quiz<span className="text-[#845adf]">Admin</span>
             </span>
           ) : (
@@ -173,7 +173,7 @@ export default function AdminDashboardLayout() {
           onMenu={() => setMobileOpen(true)}
           onToggleSidebar={toggleSidebar}
           userName={user?.fullName ?? 'Admin'}
-          userSubtitle="Platform admin"
+          userSubtitle="Admin panel"
         />
         <main className="flex-1 overflow-x-hidden p-4 lg:p-6 xl:p-8">
           <Outlet />

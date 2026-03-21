@@ -1,7 +1,7 @@
 /**
  * Full database seed for local MySQL (e.g. exam_platform in phpMyAdmin).
  *
- * 1. Creates users: Super Admin, Admin, Student (passwords from env or dev defaults).
+ * 1. Creates users: two admin-panel accounts (SUPER_ADMIN + ADMIN, same UI), Student (passwords from env or dev defaults).
  * 2. Imports subjects, topics, questions from ../../src/data/questions.json
  *
  * Run from server/:
@@ -133,13 +133,15 @@ async function main() {
   // eslint-disable-next-line no-console
   console.log('\nDone. Log in at the app with:')
   // eslint-disable-next-line no-console
-  console.log(`  Super Admin: ${superEmail} / (your SEED_SUPER_ADMIN_PASSWORD)`)
+  console.log(`  Admin panel (SUPER_ADMIN & ADMIN — same dashboard):`)
   // eslint-disable-next-line no-console
-  console.log(`  Admin:       ${adminEmail} / (your SEED_ADMIN_PASSWORD)`)
+  console.log(`    ${superEmail}  |  ${adminEmail}`)
   // eslint-disable-next-line no-console
-  console.log(`  Student:     ${studentEmail} / (your SEED_STUDENT_PASSWORD)`)
+  console.log(`    (passwords: SEED_SUPER_ADMIN_PASSWORD / SEED_ADMIN_PASSWORD or seed defaults)`)
   // eslint-disable-next-line no-console
-  console.log(`  Admin UI:    http://localhost:5173/admin/dashboard`)
+  console.log(`  Student: ${studentEmail} / (your SEED_STUDENT_PASSWORD)`)
+  // eslint-disable-next-line no-console
+  console.log(`  Open: http://localhost:5173/admin/dashboard`)
 }
 
 main()

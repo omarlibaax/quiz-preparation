@@ -87,8 +87,9 @@ export default function MainShell() {
                   <Link
                     to="/admin/dashboard"
                     className="rounded-xl px-3 py-2 text-sm font-semibold text-[#845adf] hover:bg-[#845adf]/10 dark:text-[#c4b5fd]"
+                    title="Admin panel"
                   >
-                    Admin
+                    Admin panel
                   </Link>
                 ) : null}
               </>
@@ -112,6 +113,14 @@ export default function MainShell() {
                   <Link to="/attempts" className="shrink-0 rounded-lg px-2 py-1 text-xs font-bold text-slate-700 dark:text-slate-200">
                     Attempts
                   </Link>
+                  {isAdminPanelRole(user?.role) ? (
+                    <Link
+                      to="/admin/dashboard"
+                      className="shrink-0 rounded-lg px-2 py-1 text-xs font-bold text-[#845adf] dark:text-[#c4b5fd]"
+                    >
+                      Admin
+                    </Link>
+                  ) : null}
                 </>
               ) : null}
             </div>
