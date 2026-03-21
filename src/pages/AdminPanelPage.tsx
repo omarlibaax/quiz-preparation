@@ -120,6 +120,28 @@ export default function AdminPanelPage() {
     setExamSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
   }
 
+  function moveExamSelectionUp(index: number) {
+    if (index <= 0) return
+    setExamSelectedIds((prev) => {
+      const next = [...prev]
+      ;[next[index - 1], next[index]] = [next[index], next[index - 1]]
+      return next
+    })
+  }
+
+  function moveExamSelectionDown(index: number) {
+    setExamSelectedIds((prev) => {
+      if (index >= prev.length - 1) return prev
+      const next = [...prev]
+      ;[next[index], next[index + 1]] = [next[index + 1], next[index]]
+      return next
+    })
+  }
+
+  function removeExamSelection(id: number) {
+    setExamSelectedIds((prev) => prev.filter((x) => x !== id))
+  }
+
   async function onLoadExamQuestions() {
     if (!examSubjectId) {
       setError('Select a subject for the exam first')
@@ -603,6 +625,55 @@ export default function AdminPanelPage() {
             Selected: {examSelectedIds.length} / need ≥ {examTotalQuestions} (uses first {examTotalQuestions} in
             selection order)
           </div>
+
+          {examSelectedIds.length > 0 ? (
+            <div className="mt-3 rounded-xl border border-indigo-100 bg-indigo-50/60 p-3">
+              <div className="text-xs font-bold text-indigo-900">Selection order (reorder with ↑ ↓)</div>
+              <div className="mt-2 max-h-48 space-y-1 overflow-y-auto">
+                {examSelectedIds.map((id, idx) => {
+                  const q = examQuestionPool.find((x) => x.id === id)
+                  return (
+                    <div
+                      key={`sel-${id}-${idx}`}
+                      className="flex items-center gap-2 rounded-lg bg-white/80 px-2 py-1.5 text-xs ring-1 ring-indigo-100"
+                    >
+                      <span className="w-5 shrink-0 font-bold text-slate-500">{idx + 1}</span>
+                      <span className="min-w-0 flex-1 truncate text-slate-800">
+                        #{id}
+                        {q ? ` ${q.questionText.slice(0, 70)}${q.questionText.length > 70 ? '…' : ''}` : ' (reload pool if missing)'}
+                      </span>
+                      <button
+                        type="button"
+                        disabled={idx === 0}
+                        onClick={() => moveExamSelectionUp(idx)}
+                        className="shrink-0 rounded-lg bg-slate-100 px-2 py-1 font-bold text-slate-700 disabled:opacity-40"
+                        aria-label="Move up"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        disabled={idx >= examSelectedIds.length - 1}
+                        onClick={() => moveExamSelectionDown(idx)}
+                        className="shrink-0 rounded-lg bg-slate-100 px-2 py-1 font-bold text-slate-700 disabled:opacity-40"
+                        aria-label="Move down"
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeExamSelection(id)}
+                        className="shrink-0 rounded-lg bg-rose-50 px-2 py-1 font-bold text-rose-700"
+                        aria-label="Remove"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          ) : null}
 
           <button
             type="button"

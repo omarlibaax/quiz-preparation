@@ -29,9 +29,9 @@ API: `http://localhost:4000`
 
 ### 2. First admin user (one-time)
 
-Before any admin exists, call (replace secrets and credentials):
+**Option A — in the app:** open **Login** → **First-time setup: create admin account**, and enter the same `ADMIN_BOOTSTRAP_SECRET` as in `server/.env`.
 
-`POST http://localhost:4000/api/admin/bootstrap-admin`
+**Option B — API:** `POST http://localhost:4000/api/admin/bootstrap-admin`
 
 ```json
 {
@@ -42,7 +42,7 @@ Before any admin exists, call (replace secrets and credentials):
 }
 ```
 
-Then log in from the app: **Login** on the home page.
+Then log in from the app with that email and password.
 
 ### 3. Frontend
 
