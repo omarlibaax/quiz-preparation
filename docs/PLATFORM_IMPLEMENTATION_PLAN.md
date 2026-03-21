@@ -76,6 +76,10 @@ quiz-preparation/
 - Environment-driven configuration
 - Migration-only schema changes
 
+## MySQL `exam_platform` + seed all data
+
+See **`docs/DATABASE_SEED.md`**: `DATABASE_URL` → `prisma db push` → `prisma db seed` (users + `questions.json` → subjects/topics/questions). phpMyAdmin is for inspecting tables; the **admin UI** is `/admin/dashboard` on the Vite app.
+
 ## Super Admin user
 
 - **Role** `SUPER_ADMIN` in Prisma (`UserRole`) has the same API access as `ADMIN` (middleware `requireAdmin()`).
