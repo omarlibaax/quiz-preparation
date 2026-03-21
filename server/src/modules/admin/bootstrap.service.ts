@@ -14,7 +14,7 @@ export async function bootstrapAdmin(input: {
   }
 
   const existingAdmin = await prisma.user.findFirst({
-    where: { role: 'ADMIN' },
+    where: { role: { in: ['ADMIN', 'SUPER_ADMIN'] } },
     select: { id: true },
   })
   if (existingAdmin) {

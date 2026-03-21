@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { requireAuth, requireRole } from '../auth/auth.middleware'
+import { requireAdmin, requireAuth } from '../auth/auth.middleware'
 import { bootstrapAdminSchema } from './bootstrap.schemas'
 import { bootstrapAdmin } from './bootstrap.service'
 import { importQuestionBankSchema } from './admin.schemas'
@@ -16,7 +16,7 @@ adminRouter.post('/bootstrap-admin', async (req, res) => {
 adminRouter.post(
   '/import-question-bank',
   requireAuth,
-  requireRole('ADMIN'),
+  requireAdmin(),
   async (req, res) => {
     const body = importQuestionBankSchema.parse(req.body)
     const result = await importQuestionBank({

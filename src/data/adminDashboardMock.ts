@@ -82,7 +82,7 @@ export type MockUserRow = {
   id: string
   name: string
   email: string
-  role: 'STUDENT' | 'ADMIN'
+  role: 'STUDENT' | 'ADMIN' | 'SUPER_ADMIN'
   status: 'active' | 'blocked'
   joined: string
 }

@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useThemeStore } from '../store/themeStore'
 import { cn } from '../utils/cn'
+import { isAdminPanelRole } from '../utils/roles'
 
 /** Full-width student / public app — no single “card box”; content uses the full viewport. */
 export default function MainShell() {
@@ -82,7 +83,7 @@ export default function MainShell() {
                 >
                   Attempts
                 </NavLink>
-                {user?.role === 'ADMIN' ? (
+                {isAdminPanelRole(user?.role) ? (
                   <Link
                     to="/admin/dashboard"
                     className="rounded-xl px-3 py-2 text-sm font-semibold text-[#845adf] hover:bg-[#845adf]/10 dark:text-[#c4b5fd]"

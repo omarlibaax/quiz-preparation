@@ -10,7 +10,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:push": "prisma db push",
-    "seed:import-bank": "tsx scripts/importQuestionBank.ts"
+    "seed:import-bank": "tsx scripts/importQuestionBank.ts",
+    "create-super-admin": "tsx scripts/createSuperAdmin.ts"
   },
   "keywords": [],
   "author": "",

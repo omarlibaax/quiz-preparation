@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { requireAuth, requireRole } from '../auth/auth.middleware'
+import { requireAdmin, requireAuth } from '../auth/auth.middleware'
 import {
   createQuestionSchema,
   listQuestionsQuerySchema,
@@ -29,7 +29,7 @@ questionRouter.get('/', async (req, res) => {
   res.json(questions)
 })
 
-questionRouter.get('/:id', requireAuth, requireRole('ADMIN'), async (req, res) => {
+questionRouter.get('/:id', requireAuth, requireAdmin(), async (req, res) => {
   const id = parseQuestionId(req.params.id)
   const question = await getQuestionById(id)
   res.json(question)
@@ -38,7 +38,7 @@ questionRouter.get('/:id', requireAuth, requireRole('ADMIN'), async (req, res) =
 questionRouter.post(
   '/',
   requireAuth,
-  requireRole('ADMIN'),
+  requireAdmin(),
   async (req, res) => {
     const body = createQuestionSchema.parse(req.body)
     const question = await createQuestion({
@@ -52,7 +52,7 @@ questionRouter.post(
 questionRouter.patch(
   '/:id',
   requireAuth,
-  requireRole('ADMIN'),
+  requireAdmin(),
   async (req, res) => {
     const id = parseQuestionId(req.params.id)
     const body = updateQuestionSchema.parse(req.body)
@@ -61,7 +61,7 @@ questionRouter.patch(
   },
 )
 
-questionRouter.delete('/:id', requireAuth, requireRole('ADMIN'), async (req, res) => {
+questionRouter.delete('/:id', requireAuth, requireAdmin(), async (req, res) => {
   const id = parseQuestionId(req.params.id)
   await deleteQuestion(id)
   res.status(204).send()

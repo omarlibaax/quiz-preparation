@@ -19,7 +19,7 @@ export default function AdminUsersPage() {
   const [data, setData] = useState<MockUserRow[]>(() => [...mockUsers])
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
-  const [roleFilter, setRoleFilter] = useState<'all' | 'STUDENT' | 'ADMIN'>('all')
+  const [roleFilter, setRoleFilter] = useState<'all' | 'STUDENT' | 'ADMIN' | 'SUPER_ADMIN'>('all')
 
   const tableData = useMemo(() => {
     if (roleFilter === 'all') return data
@@ -93,11 +93,14 @@ export default function AdminUsersPage() {
         <select
           className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"
           value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value as 'all' | 'STUDENT' | 'ADMIN')}
+          onChange={(e) =>
+            setRoleFilter(e.target.value as 'all' | 'STUDENT' | 'ADMIN' | 'SUPER_ADMIN')
+          }
         >
           <option value="all">All roles</option>
           <option value="STUDENT">Students</option>
           <option value="ADMIN">Admins</option>
+          <option value="SUPER_ADMIN">Super admins</option>
         </select>
       </div>
 

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { requireAuth, requireRole } from '../auth/auth.middleware'
+import { requireAdmin, requireAuth } from '../auth/auth.middleware'
 import { createSubjectSchema, createTopicSchema } from './subjects.schemas'
 import { createSubject, createTopic, listSubjects } from './subjects.service'
 
@@ -13,7 +13,7 @@ subjectRouter.get('/', async (_req, res) => {
 subjectRouter.post(
   '/',
   requireAuth,
-  requireRole('ADMIN'),
+  requireAdmin(),
   async (req, res) => {
     const body = createSubjectSchema.parse(req.body)
     const subject = await createSubject(body)
@@ -24,7 +24,7 @@ subjectRouter.post(
 subjectRouter.post(
   '/topics',
   requireAuth,
-  requireRole('ADMIN'),
+  requireAdmin(),
   async (req, res) => {
     const body = createTopicSchema.parse(req.body)
     const topic = await createTopic(body)

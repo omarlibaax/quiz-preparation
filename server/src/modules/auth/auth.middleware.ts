@@ -42,3 +42,14 @@ export function requireRole(role: UserRole) {
   }
 }
 
+const ADMIN_PANEL_ROLES: UserRole[] = ['SUPER_ADMIN', 'ADMIN']
+
+/** Full admin panel access (super admin + admin). */
+export function requireAdmin() {
+  return (req: Request, _res: Response, next: NextFunction) => {
+    if (!req.auth) throw new HttpError(401, 'Unauthorized')
+    if (!ADMIN_PANEL_ROLES.includes(req.auth.role)) throw new HttpError(403, 'Forbidden')
+    next()
+  }
+}
+

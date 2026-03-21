@@ -2,7 +2,7 @@ export type AuthUser = {
   id: number
   fullName: string
   email: string
-  role: 'ADMIN' | 'STUDENT'
+  role: 'SUPER_ADMIN' | 'ADMIN' | 'STUDENT'
   status?: 'ACTIVE' | 'SUSPENDED'
 }
 

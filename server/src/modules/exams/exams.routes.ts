@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { requireAuth, requireRole } from '../auth/auth.middleware'
+import { requireAdmin, requireAuth } from '../auth/auth.middleware'
 import { createExamSchema, publishExamSchema } from './exams.schemas'
 import { createExam, getExamById, listExams, setExamPublished } from './exams.service'
 
@@ -21,7 +21,7 @@ examRouter.get('/:id', async (req, res) => {
 examRouter.post(
   '/',
   requireAuth,
-  requireRole('ADMIN'),
+  requireAdmin(),
   async (req, res) => {
     const body = createExamSchema.parse(req.body)
     const exam = await createExam({
@@ -35,7 +35,7 @@ examRouter.post(
 examRouter.patch(
   '/:id/publish',
   requireAuth,
-  requireRole('ADMIN'),
+  requireAdmin(),
   async (req, res) => {
     const examId = Number(req.params.id)
     const body = publishExamSchema.parse(req.body)

@@ -8,11 +8,11 @@ async function main() {
   const filePath = filePathArg ? filePathArg.replace('--file=', '') : undefined
 
   const admin = await prisma.user.findFirst({
-    where: { role: 'ADMIN' },
+    where: { role: { in: ['ADMIN', 'SUPER_ADMIN'] } },
     select: { id: true },
   })
   if (!admin) {
-    throw new Error('No ADMIN user found. Create one via POST /api/admin/bootstrap-admin first.')
+    throw new Error('No admin user found. Create one via bootstrap or npm run create-super-admin.')
   }
 
   const result = await importQuestionBank({

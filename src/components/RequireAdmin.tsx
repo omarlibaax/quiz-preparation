@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { isAdminPanelRole } from '../utils/roles'
 
 export default function RequireAdmin({ children }: { children: ReactNode }) {
   const { isLoading, isAuthenticated, user } = useAuth()
@@ -16,7 +17,7 @@ export default function RequireAdmin({ children }: { children: ReactNode }) {
   }
 
   if (!isAuthenticated) return <Navigate to="/auth" replace />
-  if (user?.role !== 'ADMIN') return <Navigate to="/" replace />
+  if (!isAdminPanelRole(user?.role)) return <Navigate to="/" replace />
   return <>{children}</>
 }
 
