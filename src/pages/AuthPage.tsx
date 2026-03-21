@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
-import { bootstrapAdmin } from '../services/bootstrapApi'
 import { AuthDecorBackground } from '../components/auth/AuthDecorBackground'
 
 const REMEMBER_KEY = 'quiztime_remember'
@@ -24,12 +23,6 @@ export default function AuthPage() {
   const [rememberMe, setRememberMe] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showBootstrap, setShowBootstrap] = useState(false)
-  const [bootstrapFullName, setBootstrapFullName] = useState('')
-  const [bootstrapEmail, setBootstrapEmail] = useState('')
-  const [bootstrapPassword, setBootstrapPassword] = useState('')
-  const [bootstrapSecret, setBootstrapSecret] = useState('')
-  const [bootstrapSubmitting, setBootstrapSubmitting] = useState(false)
   const navigate = useNavigate()
   const query = useQuery()
   const returnTo = query.get('returnTo') || '/'
@@ -73,27 +66,6 @@ export default function AuthPage() {
       setError(err instanceof Error ? err.message : 'Authentication failed')
     } finally {
       setIsSubmitting(false)
-    }
-  }
-
-  async function onBootstrapSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setBootstrapSubmitting(true)
-    setError(null)
-    try {
-      await bootstrapAdmin({
-        fullName: bootstrapFullName.trim(),
-        email: bootstrapEmail.trim(),
-        password: bootstrapPassword,
-        bootstrapSecret,
-      })
-      await login({ email: bootstrapEmail.trim(), password: bootstrapPassword })
-      setShowBootstrap(false)
-      navigate(returnTo, { replace: true })
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Bootstrap failed')
-    } finally {
-      setBootstrapSubmitting(false)
     }
   }
 
@@ -291,68 +263,6 @@ export default function AuthPage() {
               </>
             )}
           </p>
-
-          <div className="mt-8 border-t border-slate-200 pt-6 dark:border-slate-700">
-            <button
-              type="button"
-              onClick={() => {
-                setShowBootstrap((v) => !v)
-                setError(null)
-              }}
-              className="text-left text-xs font-semibold text-slate-500 hover:text-[#845adf] dark:text-slate-400"
-            >
-              {showBootstrap ? 'Hide first-time admin setup' : 'First-time setup: create admin account'}
-            </button>
-            {showBootstrap ? (
-              <form onSubmit={onBootstrapSubmit} className="mt-4 space-y-3">
-                <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
-                  Use only when no admin exists. Secret must match <code className="rounded bg-slate-100 px-1 dark:bg-slate-800">ADMIN_BOOTSTRAP_SECRET</code> on the server.
-                </p>
-                <input
-                  type="text"
-                  value={bootstrapFullName}
-                  onChange={(e) => setBootstrapFullName(e.target.value)}
-                  placeholder="Full name"
-                  required
-                  minLength={2}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-950"
-                />
-                <input
-                  type="email"
-                  value={bootstrapEmail}
-                  onChange={(e) => setBootstrapEmail(e.target.value)}
-                  placeholder="Admin email"
-                  required
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-950"
-                />
-                <input
-                  type="password"
-                  value={bootstrapPassword}
-                  onChange={(e) => setBootstrapPassword(e.target.value)}
-                  placeholder="Admin password (min 8)"
-                  required
-                  minLength={8}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-950"
-                />
-                <input
-                  type="password"
-                  value={bootstrapSecret}
-                  onChange={(e) => setBootstrapSecret(e.target.value)}
-                  placeholder="Bootstrap secret"
-                  required
-                  minLength={8}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-950"
-                />
-                <button
-                  type="submit"
-                  disabled={bootstrapSubmitting}
-                  className="w-full rounded-lg bg-violet-700 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-60"
-                >
-                  {bootstrapSubmitting ? 'Creating…' : 'Create admin'}
-                </button>
-              </form>
-            ) : null}
-          </div>
         </div>
 
         <Link

@@ -29,9 +29,7 @@ API: `http://localhost:4000`
 
 ### 2. First admin user (one-time)
 
-**Option A — in the app:** open **Login** → **First-time setup: create admin account**, and enter the same `ADMIN_BOOTSTRAP_SECRET` as in `server/.env`.
-
-**Option B — API:** `POST http://localhost:4000/api/admin/bootstrap-admin`
+Use **`POST http://localhost:4000/api/admin/bootstrap-admin`** (or run `npx prisma db seed` in `server/` — see `docs/DATABASE_SEED.md`).
 
 ```json
 {
