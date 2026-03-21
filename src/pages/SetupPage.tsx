@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { listSubjects, listTopicsForSubject } from '../utils/questionBank'
 import type { Difficulty, QuizMode, QuestionType, QuizSetup } from '../types/quiz'
 import { writeJson, readJson } from '../utils/storage'
+import { fetchSubjects } from '../services/subjectsApi'
+import type { ApiSubject } from '../types/api'
 
 function useQuery() {
   const { search } = useLocation()
@@ -14,7 +16,8 @@ const PREF_KEY = 'prefs'
 type Prefs = Omit<QuizSetup, 'subjectName'> & { lastSubjectName?: string }
 
 export default function SetupPage() {
-  const subjects = listSubjects()
+  const localSubjects = useMemo(() => listSubjects(), [])
+  const [subjects, setSubjects] = useState(localSubjects)
   const q = useQuery()
   const navigate = useNavigate()
   const initialPrefs = readJson<Prefs>(PREF_KEY, {
@@ -28,8 +31,34 @@ export default function SetupPage() {
   const subjectName = q.get('subject') ?? initialPrefs.lastSubjectName ?? subjects[0]?.name ?? ''
   const [topicName, setTopicName] = useState<string | undefined>(initialPrefs.topicName)
 
-  const topics = useMemo(() => listTopicsForSubject(subjectName), [subjectName])
+  const topics = useMemo(() => {
+    const apiSubject = subjects.find((s) => s.name === subjectName)
+    if (apiSubject) return apiSubject.topics
+    return listTopicsForSubject(subjectName)
+  }, [subjectName, subjects])
   const canPickTopic = topics.length > 1
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const apiSubjects: ApiSubject[] = await fetchSubjects()
+        if (!cancelled && apiSubjects.length > 0) {
+          setSubjects(
+            apiSubjects.map((s) => ({
+              name: s.name,
+              topics: s.topics.map((t) => t.name),
+            })),
+          )
+        }
+      } catch {
+        // keep local fallback
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const [numberOfQuestions, setNumberOfQuestions] = useState(initialPrefs.numberOfQuestions)
   const [timeLimitSeconds, setTimeLimitSeconds] = useState<number | null>(initialPrefs.timeLimitSeconds)

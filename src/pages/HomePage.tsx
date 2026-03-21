@@ -1,9 +1,38 @@
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { listSubjects } from '../utils/questionBank'
 import SubjectIcon from '../components/SubjectIcon'
+import { fetchSubjects } from '../services/subjectsApi'
+import type { ApiSubject } from '../types/api'
 
 export default function HomePage() {
-  const subjects = listSubjects()
+  const localSubjects = useMemo(() => listSubjects(), [])
+  const [subjects, setSubjects] = useState(localSubjects)
+  const [usingBackend, setUsingBackend] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const apiSubjects: ApiSubject[] = await fetchSubjects()
+        if (!cancelled && apiSubjects.length > 0) {
+          setSubjects(
+            apiSubjects.map((s) => ({
+              name: s.name,
+              topics: s.topics.map((t) => t.name),
+            })),
+          )
+          setUsingBackend(true)
+        }
+      } catch {
+        if (!cancelled) setUsingBackend(false)
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const tileAccents = [
     { bg: 'bg-indigo-50', text: 'text-indigo-700', ring: 'ring-indigo-200' },
@@ -90,7 +119,9 @@ export default function HomePage() {
       </section>
 
       <footer className="mt-5 text-center text-xs text-slate-500">
-        Runs offline from JSON + local storage (no database).
+        {usingBackend
+          ? 'Connected to backend API for subject catalog.'
+          : 'Using local JSON fallback (backend unavailable).'}
       </footer>
     </div>
   )
