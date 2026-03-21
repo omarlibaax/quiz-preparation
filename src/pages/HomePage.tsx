@@ -7,7 +7,7 @@ import type { ApiSubject } from '../types/api'
 import { useAuth } from '../context/AuthContext'
 
 export default function HomePage() {
-  const { isAuthenticated, user, logout } = useAuth()
+  const { isAuthenticated } = useAuth()
   const localSubjects = useMemo(() => listSubjects(), [])
   const [subjects, setSubjects] = useState(localSubjects)
   const [usingBackend, setUsingBackend] = useState(false)
@@ -36,123 +36,153 @@ export default function HomePage() {
     }
   }, [])
 
-  const tileAccents = [
-    { bg: 'bg-indigo-50', text: 'text-indigo-700', ring: 'ring-indigo-200' },
-    { bg: 'bg-orange-50', text: 'text-orange-700', ring: 'ring-orange-200' },
-    { bg: 'bg-emerald-50', text: 'text-emerald-700', ring: 'ring-emerald-200' },
-    { bg: 'bg-violet-50', text: 'text-violet-700', ring: 'ring-violet-200' },
-    { bg: 'bg-rose-50', text: 'text-rose-700', ring: 'ring-rose-200' },
+  const accents = [
+    { ring: 'ring-violet-500/25', glow: 'from-violet-500/20 to-transparent', icon: 'from-violet-500 to-indigo-600' },
+    { ring: 'ring-sky-500/25', glow: 'from-sky-500/20 to-transparent', icon: 'from-sky-500 to-cyan-600' },
+    { ring: 'ring-emerald-500/25', glow: 'from-emerald-500/15 to-transparent', icon: 'from-emerald-500 to-teal-600' },
+    { ring: 'ring-amber-500/25', glow: 'from-amber-500/15 to-transparent', icon: 'from-amber-500 to-orange-600' },
+    { ring: 'ring-rose-500/25', glow: 'from-rose-500/15 to-transparent', icon: 'from-rose-500 to-pink-600' },
   ]
 
   return (
-    <div className="flex-1 p-4 sm:p-6">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="flex h-16 w-16 items-center justify-center rounded-[1.3rem] bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-sm">
-            <svg viewBox="0 0 24 24" className="h-10 w-10" aria-hidden="true" fill="none">
-              <path
-                d="M9.1 9a3 3 0 1 1 4.8 2.4c-.9.7-1.4 1.2-1.4 2.6"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-              />
-              <circle cx="12" cy="17.5" r="1" fill="currentColor" />
-              <path
-                d="M4.5 12a7.5 7.5 0 1 0 15 0a7.5 7.5 0 1 0 -15 0"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
+    <div className="w-full">
+      {/* Hero — full width, not inside a card */}
+      <section className="relative overflow-hidden border-b border-slate-200/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50/40 px-4 py-16 dark:border-slate-800 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/40 sm:px-6 lg:px-8">
+        <div className="pointer-events-none absolute -right-24 top-0 h-72 w-72 rounded-full bg-[#845adf]/20 blur-3xl dark:bg-[#845adf]/10" />
+        <div className="pointer-events-none absolute -left-20 bottom-0 h-64 w-64 rounded-full bg-sky-400/15 blur-3xl" />
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-2 lg:items-center">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">QuizTime</div>
-            <h1 className="mt-0.5 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-              Quiz Time
+            <p className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/70 px-3 py-1 text-xs font-bold uppercase tracking-widest text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-300">
+              Adaptive quizzes
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              Track progress
+            </p>
+            <h1 className="mt-5 text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl lg:text-6xl">
+              Master every subject,{' '}
+              <span className="bg-gradient-to-r from-[#845adf] to-sky-500 bg-clip-text text-transparent">one quiz at a time</span>
             </h1>
-            <p className="text-sm text-slate-500 sm:text-base">Choose a category to begin</p>
-          </div>
-        </div>
-        <div>
-          {isAuthenticated ? (
-            <div className="flex items-center gap-2">
+            <p className="mt-5 max-w-xl text-lg text-slate-600 dark:text-slate-300">
+              Pick a category, configure difficulty and timing, and practice with instant feedback — full-width experience built
+              for focus.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              {isAuthenticated ? (
+                <Link
+                  to="/setup"
+                  className="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-6 py-3 text-sm font-bold text-white shadow-xl transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
+                >
+                  Start a quiz
+                </Link>
+              ) : (
+                <Link
+                  to="/auth"
+                  className="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-6 py-3 text-sm font-bold text-white shadow-xl transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
+                >
+                  Get started
+                </Link>
+              )}
               <Link
                 to="/dashboard"
-                className="rounded-xl bg-indigo-50 px-3 py-2 text-xs font-semibold text-indigo-700 ring-1 ring-indigo-200 transition hover:bg-indigo-100"
+                className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white/80 px-6 py-3 text-sm font-bold text-slate-800 shadow-sm backdrop-blur transition hover:bg-white dark:border-slate-700 dark:bg-slate-900/80 dark:text-white dark:hover:bg-slate-800"
               >
-                Dashboard
+                View dashboard
               </Link>
-              <Link
-                to="/attempts"
-                className="rounded-xl bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-800 ring-1 ring-sky-200 transition hover:bg-sky-100"
-              >
-                Attempts
-              </Link>
-              {user?.role === 'ADMIN' ? (
-                <Link
-                  to="/admin"
-                  className="rounded-xl bg-violet-50 px-3 py-2 text-xs font-semibold text-violet-700 ring-1 ring-violet-200 transition hover:bg-violet-100"
-                >
-                  Admin
-                </Link>
-              ) : null}
-              <div className="hidden text-xs font-semibold text-slate-500 sm:block">{user?.fullName}</div>
-              <button
-                type="button"
-                onClick={logout}
-                className="rounded-xl bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-200"
-              >
-                Logout
-              </button>
             </div>
-          ) : (
-            <Link
-              to="/auth"
-              className="rounded-xl bg-indigo-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-indigo-700"
-            >
-              Login
-            </Link>
-          )}
-        </div>
-      </div>
-
-      <section className="mt-4 space-y-4">
-        <div className="rounded-[1.8rem] bg-white/70 p-4 shadow-sm ring-1 ring-slate-200/70">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Choose a category</h2>
-              <p className="mt-1 text-xs text-slate-500">Select a subject and set your quiz.</p>
+            <dl className="mt-10 grid grid-cols-3 gap-4 border-t border-slate-200/80 pt-8 dark:border-slate-800">
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Subjects</dt>
+                <dd className="mt-1 text-2xl font-black tabular-nums text-slate-900 dark:text-white">{subjects.length}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Topics</dt>
+                <dd className="mt-1 text-2xl font-black tabular-nums text-slate-900 dark:text-white">
+                  {subjects.reduce((n, s) => n + s.topics.length, 0)}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Catalog</dt>
+                <dd className="mt-1 text-sm font-bold text-emerald-600 dark:text-emerald-400">{usingBackend ? 'API' : 'Local'}</dd>
+              </div>
+            </dl>
+          </div>
+          <div className="relative">
+            <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-[#845adf]/30 via-indigo-500/10 to-sky-500/20 blur-2xl" />
+            <div className="relative overflow-hidden rounded-[1.75rem] border border-white/60 bg-white/70 p-6 shadow-2xl shadow-indigo-500/10 backdrop-blur-xl dark:border-slate-700/80 dark:bg-slate-900/70">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Today&apos;s focus</p>
+                  <p className="mt-1 text-lg font-bold text-slate-900 dark:text-white">Build streaks & accuracy</p>
+                </div>
+                <span className="rounded-xl bg-emerald-500/15 px-2 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                  Live
+                </span>
+              </div>
+              <div className="mt-6 space-y-3">
+                {['Timed mode', 'Review mistakes', 'Topic drills'].map((label, i) => (
+                  <div
+                    key={label}
+                    className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/90 px-4 py-3 dark:border-slate-800 dark:bg-slate-800/50"
+                  >
+                    <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{label}</span>
+                    <span className="text-xs font-bold text-[#845adf]">{90 - i * 8}%</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      {/* Subjects — bento grid */}
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Choose a category</h2>
+            <p className="mt-1 text-slate-600 dark:text-slate-400">Jump into a subject — each tile opens quiz setup.</p>
+          </div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            {usingBackend ? 'Connected to API' : 'Offline JSON catalog'}
+          </p>
+        </div>
+
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {subjects.map((s, idx) => {
-            const acc = tileAccents[idx % tileAccents.length]
+            const a = accents[idx % accents.length]
             return (
               <Link
                 key={s.name}
                 to={`/setup?subject=${encodeURIComponent(s.name)}`}
-                className="group flex h-32 flex-col justify-between rounded-[1.8rem] border border-slate-200 bg-white/70 p-5 shadow-sm transition-all duration-300 hover:-translate-y-[2px] hover:bg-white hover:shadow-md"
+                className={[
+                  'group relative flex min-h-[168px] flex-col justify-between overflow-hidden rounded-3xl border border-slate-200/90 bg-white p-6 shadow-card transition',
+                  'hover:-translate-y-1 hover:shadow-card-lg dark:border-slate-800 dark:bg-slate-900/80',
+                  'ring-1',
+                  a.ring,
+                ].join(' ')}
               >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="text-sm font-semibold text-slate-600">Subject</div>
+                <div
+                  className={[
+                    'pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br opacity-60 blur-2xl transition group-hover:opacity-100',
+                    a.glow,
+                  ].join(' ')}
+                />
+                <div className="relative flex items-start justify-between gap-3">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Subject</span>
                   <div
                     className={[
-                      'flex h-12 w-12 items-center justify-center rounded-2xl ring-1',
-                      acc.bg,
-                      acc.ring,
-                      acc.text,
+                      'flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br text-white shadow-lg',
+                      a.icon,
                     ].join(' ')}
                   >
-                    <SubjectIcon subjectName={s.name} className="h-10 w-10" />
+                    <SubjectIcon subjectName={s.name} className="h-9 w-9" />
                   </div>
                 </div>
-
-                <div className="leading-tight">
-                  <div className="text-lg font-extrabold text-slate-900">{s.name}</div>
-                  <div className="mt-1 text-[12px] text-slate-600 sm:text-[13px]">
-                    {s.topics.length} topic{s.topics.length !== 1 ? 's' : ''}
+                <div className="relative mt-6">
+                  <div className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">{s.name}</div>
+                  <div className="mt-2 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                    <span className="rounded-lg bg-slate-100 px-2 py-0.5 text-xs font-bold dark:bg-slate-800">
+                      {s.topics.length} topic{s.topics.length !== 1 ? 's' : ''}
+                    </span>
+                    <span className="text-[#845adf] opacity-0 transition group-hover:opacity-100">Open →</span>
                   </div>
                 </div>
               </Link>
@@ -160,13 +190,6 @@ export default function HomePage() {
           })}
         </div>
       </section>
-
-      <footer className="mt-5 text-center text-xs text-slate-500">
-        {usingBackend
-          ? 'Connected to backend API for subject catalog.'
-          : 'Using local JSON fallback (backend unavailable).'}
-      </footer>
     </div>
   )
 }
-

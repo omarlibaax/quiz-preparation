@@ -2,7 +2,7 @@
 
 Full-stack exam preparation app: **React (Vite) + Tailwind** frontend, **Node/Express + Prisma + MySQL** backend.
 
-- **Students**: register/login, take quizzes (local JSON fallback or backend exams), results, dashboard.
+- **Students**: register/login, take quizzes (local JSON fallback or backend exams), results, dashboard, **attempt history** (`/attempts`).
 - **Admins**: `/admin` — subjects, topics, questions, exams, publish, import JSON question bank.
 
 ## Prerequisites
