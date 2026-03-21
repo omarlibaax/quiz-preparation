@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { createQuestion, createSubject, createTopic } from '../services/adminApi'
+import { createQuestion, createSubject, createTopic, importQuestionBank } from '../services/adminApi'
 import { createExam, listAllExams, setExamPublished } from '../services/examsApi'
 import { listQuestions } from '../services/questionsApi'
 import { fetchSubjects } from '../services/subjectsApi'
@@ -37,6 +37,10 @@ export default function AdminPanelPage() {
   const [loadingExamQuestions, setLoadingExamQuestions] = useState(false)
   const [publishExamAfterCreate, setPublishExamAfterCreate] = useState(false)
 
+  const [importClearExisting, setImportClearExisting] = useState(false)
+  const [importFilePath, setImportFilePath] = useState('')
+  const [importingBank, setImportingBank] = useState(false)
+
   async function loadAll() {
     const [s, e] = await Promise.all([fetchSubjects(), listAllExams()])
     setSubjects(s)
@@ -46,6 +50,29 @@ export default function AdminPanelPage() {
   useEffect(() => {
     void loadAll()
   }, [])
+
+  async function onImportQuestionBank() {
+    if (!tokens?.accessToken) return
+    setImportingBank(true)
+    setError(null)
+    try {
+      const result = await importQuestionBank(
+        {
+          clearExisting: importClearExisting,
+          filePath: importFilePath.trim() || undefined,
+        },
+        tokens.accessToken,
+      )
+      setStatus(
+        `Import done: +${result.questionsCreated} questions, skipped ${result.questionsSkipped} (${result.subjectsCreated} subjects, ${result.topicsCreated} topics new)`,
+      )
+      await loadAll()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Import failed')
+    } finally {
+      setImportingBank(false)
+    }
+  }
 
   async function onCreateSubject() {
     if (!tokens?.accessToken || !subjectName.trim()) return
@@ -239,6 +266,39 @@ export default function AdminPanelPage() {
       <div className="space-y-4">
         {status ? <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">{status}</div> : null}
         {error ? <div className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</div> : null}
+
+        <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80">
+          <h2 className="text-sm font-bold text-slate-900">Import question bank</h2>
+          <p className="mt-1 text-xs text-slate-500">
+            Loads JSON into MySQL via the API. If you leave the path empty, the server uses its default (
+            <code className="rounded bg-slate-100 px-1">src/data/questions.json</code> relative to the repo). Optional path
+            must be reachable <strong>on the server machine</strong>.
+          </p>
+          <div className="mt-3 space-y-2">
+            <label className="flex items-center gap-2 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                checked={importClearExisting}
+                onChange={(e) => setImportClearExisting(e.target.checked)}
+              />
+              Clear existing subjects/topics/questions/exams first (destructive)
+            </label>
+            <input
+              value={importFilePath}
+              onChange={(e) => setImportFilePath(e.target.value)}
+              placeholder="Server file path (optional)"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            />
+            <button
+              type="button"
+              onClick={onImportQuestionBank}
+              disabled={importingBank}
+              className="rounded-xl bg-amber-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
+            >
+              {importingBank ? 'Importing…' : 'Run import'}
+            </button>
+          </div>
+        </section>
 
         <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80">
           <h2 className="text-sm font-bold text-slate-900">Create Subject</h2>

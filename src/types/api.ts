@@ -147,3 +147,11 @@ export type ApiCreatedExam = {
   isPublished: boolean
 }
 
+export type ApiImportBankResult = {
+  importedSubjects: number
+  subjectsCreated: number
+  topicsCreated: number
+  questionsCreated: number
+  questionsSkipped: number
+}
+

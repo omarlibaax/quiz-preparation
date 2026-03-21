@@ -1,4 +1,4 @@
-import type { ApiQuestion, ApiSubject } from '../types/api'
+import type { ApiImportBankResult, ApiQuestion, ApiSubject } from '../types/api'
 import { apiPost } from './apiClient'
 
 export function createSubject(name: string, accessToken: string) {
@@ -34,6 +34,17 @@ export function createQuestion(input: CreateQuestionInput, accessToken: string) 
   return apiPost<ApiQuestion, CreateQuestionInput>(
     '/api/questions',
     input,
+    { accessToken },
+  )
+}
+
+export function importQuestionBank(
+  input: { clearExisting?: boolean; filePath?: string },
+  accessToken: string,
+) {
+  return apiPost<ApiImportBankResult, { clearExisting?: boolean; filePath?: string }>(
+    '/api/admin/import-question-bank',
+    { clearExisting: input.clearExisting ?? false, filePath: input.filePath },
     { accessToken },
   )
 }
