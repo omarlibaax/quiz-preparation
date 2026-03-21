@@ -4,8 +4,10 @@ import { listSubjects } from '../utils/questionBank'
 import SubjectIcon from '../components/SubjectIcon'
 import { fetchSubjects } from '../services/subjectsApi'
 import type { ApiSubject } from '../types/api'
+import { useAuth } from '../context/AuthContext'
 
 export default function HomePage() {
+  const { isAuthenticated, user, logout } = useAuth()
   const localSubjects = useMemo(() => listSubjects(), [])
   const [subjects, setSubjects] = useState(localSubjects)
   const [usingBackend, setUsingBackend] = useState(false)
@@ -70,6 +72,27 @@ export default function HomePage() {
             </h1>
             <p className="text-sm text-slate-500 sm:text-base">Choose a category to begin</p>
           </div>
+        </div>
+        <div>
+          {isAuthenticated ? (
+            <div className="flex items-center gap-2">
+              <div className="hidden text-xs font-semibold text-slate-500 sm:block">{user?.fullName}</div>
+              <button
+                type="button"
+                onClick={logout}
+                className="rounded-xl bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-200"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/auth"
+              className="rounded-xl bg-indigo-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-indigo-700"
+            >
+              Login
+            </Link>
+          )}
         </div>
       </div>
 
