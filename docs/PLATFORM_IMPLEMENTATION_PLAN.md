@@ -97,7 +97,7 @@ See **`docs/DATABASE_SEED.md`**: `DATABASE_URL` → `prisma db push` → `prisma
   - `PATCH /api/questions/:id` — update
   - `DELETE /api/questions/:id` — delete
 - **Subjects / topics**: `POST /api/subjects` and `POST /api/subjects/topics` (admin).
-- **UI**: Admin → **Question bank** — filters, new subject/topic, **New question**, edit/delete; **Import data** for JSON import.
+- **UI**: Admin → **Question Bank** — filters, new subject/topic, **New question**, edit/delete, link to Operations for JSON import.
 
 ## Immediate Next Steps (Current Sprint)
 

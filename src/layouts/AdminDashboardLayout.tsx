@@ -1,4 +1,3 @@
-import type { ComponentType } from 'react'
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -8,46 +7,17 @@ import { cn } from '../utils/cn'
 import { AdminHeader } from '../components/admin/AdminHeader'
 import { AdminRightPanel } from '../components/admin/AdminRightPanel'
 
-type NavItem = {
-  to: string
-  label: string
-  icon: ComponentType<{ className?: string }>
-  /** Only match exact path (e.g. avoid /admin/exams matching /admin/exams/builder) */
-  end?: boolean
-}
+const mainNav = [
+  { to: '/admin/dashboard', label: 'Dashboard', icon: IconHome, badge: '12' },
+  { to: '/admin/users', label: 'Users', icon: IconUsers },
+  { to: '/admin/exams', label: 'Exams', icon: IconDoc },
+]
 
-const navSections: { title: string; items: NavItem[] }[] = [
-  {
-    title: 'Overview',
-    items: [{ to: '/admin/dashboard', label: 'Dashboard', icon: IconHome, end: true }],
-  },
-  {
-    title: 'Content',
-    items: [
-      { to: '/admin/subjects', label: 'Subjects & topics', icon: IconFolder },
-      { to: '/admin/questions', label: 'Question bank', icon: IconBank },
-      { to: '/admin/import', label: 'Import data', icon: IconTool },
-    ],
-  },
-  {
-    title: 'Exams',
-    items: [
-      { to: '/admin/exams', label: 'All exams', icon: IconDoc, end: true },
-      { to: '/admin/exams/builder', label: 'Create exam', icon: IconPlus },
-    ],
-  },
-  {
-    title: 'People',
-    items: [{ to: '/admin/users', label: 'Users', icon: IconUsers }],
-  },
-  {
-    title: 'Insights',
-    items: [{ to: '/admin/analytics', label: 'Analytics', icon: IconChart }],
-  },
-  {
-    title: 'System',
-    items: [{ to: '/admin/settings', label: 'Settings', icon: IconGear }],
-  },
+const generalNav = [
+  { to: '/admin/questions', label: 'Question Bank', icon: IconBank },
+  { to: '/admin/analytics', label: 'Analytics', icon: IconChart },
+  { to: '/admin/settings', label: 'Settings', icon: IconGear },
+  { to: '/admin/operations', label: 'Operations', icon: IconTool },
 ]
 
 export default function AdminDashboardLayout() {
@@ -101,39 +71,72 @@ export default function AdminDashboardLayout() {
           </button>
         </div>
 
-        <nav className="flex-1 space-y-5 overflow-y-auto px-2 py-4">
-          {navSections.map((section) => (
-            <div key={section.title}>
-              {!collapsed ? (
-                <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
-                  {section.title}
-                </p>
-              ) : null}
-              <div className="space-y-0.5">
-                {section.items.map((item) => (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    end={item.end ?? false}
-                    onClick={() => setMobileOpen(false)}
-                    className={({ isActive }) =>
-                      cn(
-                        'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
-                        isActive
-                          ? 'bg-[#845adf] text-white shadow-lg shadow-[#845adf]/25'
-                          : 'text-slate-300 hover:bg-admin-sidebar-hover hover:text-white',
-                        collapsed && 'justify-center px-2',
-                      )
-                    }
-                    title={collapsed ? item.label : undefined}
-                  >
-                    <item.icon className="h-5 w-5 shrink-0 opacity-90" />
-                    {!collapsed ? <span className="truncate">{item.label}</span> : null}
-                  </NavLink>
-                ))}
-              </div>
+        <nav className="flex-1 space-y-6 overflow-y-auto px-2 py-4">
+          <div>
+            {!collapsed ? (
+              <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Main</p>
+            ) : null}
+            <div className="space-y-0.5">
+              {mainNav.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === '/admin/dashboard'}
+                  onClick={() => setMobileOpen(false)}
+                  className={({ isActive }) =>
+                    cn(
+                      'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
+                      isActive
+                        ? 'bg-[#845adf] text-white shadow-lg shadow-[#845adf]/25'
+                        : 'text-slate-300 hover:bg-admin-sidebar-hover hover:text-white',
+                      collapsed && 'justify-center px-2',
+                    )
+                  }
+                  title={collapsed ? item.label : undefined}
+                >
+                  <item.icon className="h-5 w-5 shrink-0 opacity-90" />
+                  {!collapsed ? (
+                    <span className="flex flex-1 items-center justify-between gap-2">
+                      <span>{item.label}</span>
+                      {item.badge ? (
+                        <span className="rounded-md bg-amber-500/90 px-1.5 py-0.5 text-[10px] font-bold text-slate-900">
+                          {item.badge}
+                        </span>
+                      ) : null}
+                    </span>
+                  ) : null}
+                </NavLink>
+              ))}
             </div>
-          ))}
+          </div>
+
+          <div>
+            {!collapsed ? (
+              <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">General</p>
+            ) : null}
+            <div className="space-y-0.5">
+              {generalNav.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setMobileOpen(false)}
+                  className={({ isActive }) =>
+                    cn(
+                      'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
+                      isActive
+                        ? 'bg-[#845adf] text-white shadow-lg shadow-[#845adf]/25'
+                        : 'text-slate-300 hover:bg-admin-sidebar-hover hover:text-white',
+                      collapsed && 'justify-center px-2',
+                    )
+                  }
+                  title={collapsed ? item.label : undefined}
+                >
+                  <item.icon className="h-5 w-5 shrink-0 opacity-90" />
+                  {!collapsed ? item.label : null}
+                </NavLink>
+              ))}
+            </div>
+          </div>
         </nav>
 
         <div className={cn('border-t border-white/5 p-2', collapsed ? 'flex flex-col items-center' : '')}>
@@ -182,24 +185,6 @@ export default function AdminDashboardLayout() {
   )
 }
 
-function IconFolder({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"
-      />
-    </svg>
-  )
-}
-function IconPlus({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-    </svg>
-  )
-}
 function IconChevron({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">

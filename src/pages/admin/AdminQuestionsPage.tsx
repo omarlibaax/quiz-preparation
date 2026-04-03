@@ -119,7 +119,8 @@ export default function AdminQuestionsPage() {
         <div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Question bank</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Questions are stored in the database. Import a JSON bank from <strong>Import data</strong>, or add items here.
+            Questions are stored in the database. Import a JSON bank from Operations &gt; Import data, or add items
+            here.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -138,7 +139,7 @@ export default function AdminQuestionsPage() {
             New question
           </button>
           <Link
-            to="/admin/import"
+            to="/admin/operations/import"
             className="inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
           >
             Bulk import (JSON)
