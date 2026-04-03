@@ -123,6 +123,25 @@ export default function AdminReportsPage() {
       }),
     [examRows, filters, debouncedSearch],
   )
+  const filteredAttempts = useMemo(
+    () =>
+      attemptRows.filter((row) => {
+        if (!inDateRange(row.attemptDate, filters)) return false
+        if (filters.subject !== 'ALL' && row.subject !== filters.subject) return false
+        if (filters.exam !== 'ALL' && row.examName !== filters.exam) return false
+        if (filters.user !== 'ALL' && row.studentName !== filters.user) return false
+        if (filters.status !== 'ALL' && row.result !== filters.status) return false
+        if (filters.minScore !== '' && row.score < filters.minScore) return false
+        if (filters.maxScore !== '' && row.score > filters.maxScore) return false
+        if (
+          debouncedSearch &&
+          !`${row.studentName} ${row.examName} ${row.email}`.toLowerCase().includes(debouncedSearch.toLowerCase())
+        )
+          return false
+        return true
+      }),
+    [attemptRows, filters, debouncedSearch],
+  )
 
   const studentColumns = useMemo<ColumnDef<StudentPerformanceRow>[]>(
     () => [
@@ -174,9 +193,46 @@ export default function AdminReportsPage() {
     ],
     [],
   )
+  const attemptColumns = useMemo<ColumnDef<AttemptReportRow>[]>(
+    () => [
+      { accessorKey: 'studentName', header: 'Student Name' },
+      { accessorKey: 'email', header: 'Email' },
+      { accessorKey: 'examName', header: 'Exam Name' },
+      { accessorKey: 'subject', header: 'Subject' },
+      { accessorKey: 'score', header: 'Score' },
+      {
+        accessorKey: 'result',
+        header: 'Result',
+        cell: (ctx) => {
+          const value = String(ctx.getValue())
+          const className =
+            value === 'PASS'
+              ? 'rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700'
+              : 'rounded-full bg-rose-100 px-2 py-0.5 text-xs font-semibold text-rose-700'
+          return <span className={className}>{value}</span>
+        },
+      },
+      { accessorKey: 'timeTakenMinutes', header: 'Time Taken (min)' },
+      {
+        accessorKey: 'attemptDate',
+        header: 'Attempt Date',
+        cell: (ctx) => formatDate(String(ctx.getValue())),
+      },
+    ],
+    [],
+  )
 
-  const activeRows = reportType === 'student' ? filteredStudents : reportType === 'exam' ? filteredExams : []
-  const activeColumns = (reportType === 'student' ? studentColumns : examColumns) as ColumnDef<ReportRow>[]
+  const activeRows =
+    reportType === 'student'
+      ? filteredStudents
+      : reportType === 'exam'
+        ? filteredExams
+        : reportType === 'attempt'
+          ? filteredAttempts
+          : []
+  const activeColumns = (
+    reportType === 'student' ? studentColumns : reportType === 'exam' ? examColumns : attemptColumns
+  ) as ColumnDef<ReportRow>[]
 
   function savePreset(name: string) {
     const preset: SavedReportPreset = {
@@ -203,7 +259,7 @@ export default function AdminReportsPage() {
   }
 
   function printReport() {
-    const headers = (reportType === 'student' ? studentColumns : examColumns).map((c) =>
+    const headers = (reportType === 'student' ? studentColumns : reportType === 'exam' ? examColumns : attemptColumns).map((c) =>
       typeof c.header === 'string' ? c.header : 'Column',
     )
     const rows =
@@ -215,16 +271,25 @@ export default function AdminReportsPage() {
                 `<tr><td>${r.studentName}</td><td>${r.email}</td><td>${r.totalExams}</td><td>${r.averageScore}</td><td>${r.highestScore}</td><td>${r.lowestScore}</td><td>${r.passRate}%</td><td>${formatDate(r.lastActivityDate)}</td></tr>`,
             )
             .join('')
-        : filteredExams
-            .slice(0, 50)
-            .map(
-              (r) =>
-                `<tr><td>${r.examTitle}</td><td>${r.subject}</td><td>${r.totalAttempts}</td><td>${r.passedStudents}</td><td>${r.failedStudents}</td><td>${r.averageScore}</td><td>${r.passPercentage}%</td><td>${formatDate(r.createdDate)}</td></tr>`,
-            )
-            .join('')
+        : reportType === 'exam'
+          ? filteredExams
+              .slice(0, 50)
+              .map(
+                (r) =>
+                  `<tr><td>${r.examTitle}</td><td>${r.subject}</td><td>${r.totalAttempts}</td><td>${r.passedStudents}</td><td>${r.failedStudents}</td><td>${r.averageScore}</td><td>${r.passPercentage}%</td><td>${formatDate(r.createdDate)}</td></tr>`,
+              )
+              .join('')
+          : filteredAttempts
+              .slice(0, 50)
+              .map(
+                (r) =>
+                  `<tr><td>${r.studentName}</td><td>${r.email}</td><td>${r.examName}</td><td>${r.subject}</td><td>${r.score}</td><td>${r.result}</td><td>${r.timeTakenMinutes}</td><td>${formatDate(r.attemptDate)}</td></tr>`,
+              )
+              .join('')
     const html = `<table><thead><tr>${headers.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`
     printReportHtml({
-      title: reportType === 'student' ? 'Student Performance Report' : 'Exam Report',
+      title:
+        reportType === 'student' ? 'Student Performance Report' : reportType === 'exam' ? 'Exam Report' : 'Attempt-Level Report',
       subtitle: `Date range: ${filters.fromDate || 'Any'} - ${filters.toDate || 'Any'}`,
       tableHtml: html,
     })
@@ -312,6 +377,13 @@ export default function AdminReportsPage() {
         <ReportDataTable<ExamReportRow>
           columns={examColumns}
           rows={filteredExams}
+          loading={loading}
+          onRowClick={(row) => setSelectedDrillDown(row)}
+        />
+      ) : reportType === 'attempt' ? (
+        <ReportDataTable<AttemptReportRow>
+          columns={attemptColumns}
+          rows={filteredAttempts}
           loading={loading}
           onRowClick={(row) => setSelectedDrillDown(row)}
         />
