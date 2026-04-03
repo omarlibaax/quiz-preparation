@@ -2,11 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { fetchSubjects } from '../../services/subjectsApi'
 import { listAllExams } from '../../services/examsApi'
-import type { ApiExam, ApiSubject } from '../../types/api'
+import { listQuestions } from '../../services/questionsApi'
+import type { ApiExam, ApiQuestionListItem, ApiSubject } from '../../types/api'
 import { ReportDataTable } from '../../features/reports/components/ReportDataTable'
 import { ReportFiltersBar } from '../../features/reports/components/ReportFiltersBar'
 import { useDebouncedValue } from '../../features/reports/hooks/useDebouncedValue'
-import { buildAttemptRows, buildExamRows, buildStudentRows } from '../../features/reports/utils/mockReportData'
+import { buildAttemptRows, buildExamRows, buildQuestionRows, buildStudentRows } from '../../features/reports/utils/mockReportData'
 import type {
   AttemptReportRow,
   ExamReportRow,
@@ -42,6 +43,7 @@ export default function AdminReportsPage() {
   const [presets, setPresets] = useState<SavedReportPreset[]>([])
   const [subjects, setSubjects] = useState<ApiSubject[]>([])
   const [exams, setExams] = useState<ApiExam[]>([])
+  const [questions, setQuestions] = useState<ApiQuestionListItem[]>([])
   const [selectedDrillDown, setSelectedDrillDown] = useState<ReportRow | null>(null)
   const [auditLogs, setAuditLogs] = useState<string[]>([])
 
@@ -69,6 +71,9 @@ export default function AdminReportsPage() {
         const [subjectData, examData] = await Promise.all([fetchSubjects(), listAllExams()])
         setSubjects(subjectData)
         setExams(examData)
+        const topicIds = subjectData.flatMap((s) => s.topics.map((t) => t.id)).slice(0, 10)
+        const batches = await Promise.all(topicIds.map((topicId) => listQuestions({ topicId, limit: 80 })))
+        setQuestions(batches.flat())
       } finally {
         setLoading(false)
       }
@@ -80,6 +85,7 @@ export default function AdminReportsPage() {
   const studentRows = useMemo(() => buildStudentRows(attempts), [attempts])
   const examRows = useMemo(() => buildExamRows(attempts, exams), [attempts, exams])
   const attemptRows = useMemo(() => attempts, [attempts])
+  const questionRows = useMemo(() => buildQuestionRows(questions, attempts), [questions, attempts])
 
   const subjectOptions = useMemo(
     () => subjects.map((s) => ({ label: s.name, value: s.name })),
@@ -141,6 +147,22 @@ export default function AdminReportsPage() {
         return true
       }),
     [attemptRows, filters, debouncedSearch],
+  )
+  const filteredQuestions = useMemo(
+    () =>
+      questionRows.filter((row) => {
+        if (filters.subject !== 'ALL' && row.subject !== filters.subject) return false
+        if (filters.topic !== 'ALL' && row.topic !== filters.topic) return false
+        if (filters.minScore !== '' && row.correctPercent < filters.minScore) return false
+        if (filters.maxScore !== '' && row.correctPercent > filters.maxScore) return false
+        if (
+          debouncedSearch &&
+          !`${row.questionText} ${row.subject} ${row.topic}`.toLowerCase().includes(debouncedSearch.toLowerCase())
+        )
+          return false
+        return true
+      }),
+    [questionRows, filters, debouncedSearch],
   )
 
   const studentColumns = useMemo<ColumnDef<StudentPerformanceRow>[]>(
@@ -221,6 +243,39 @@ export default function AdminReportsPage() {
     ],
     [],
   )
+  const questionColumns = useMemo<ColumnDef<QuestionAnalysisRow>[]>(
+    () => [
+      { accessorKey: 'questionId', header: 'Question ID' },
+      {
+        accessorKey: 'questionText',
+        header: 'Question Text',
+        cell: (ctx) => {
+          const value = String(ctx.getValue())
+          const short = value.length > 78 ? `${value.slice(0, 78)}...` : value
+          return (
+            <span title={value} className="block max-w-[420px] truncate">
+              {short}
+            </span>
+          )
+        },
+      },
+      { accessorKey: 'subject', header: 'Subject' },
+      { accessorKey: 'topic', header: 'Topic' },
+      { accessorKey: 'difficulty', header: 'Difficulty' },
+      { accessorKey: 'timesAttempted', header: 'Times Attempted' },
+      {
+        accessorKey: 'correctPercent',
+        header: 'Correct %',
+        cell: (ctx) => `${ctx.getValue()}%`,
+      },
+      {
+        accessorKey: 'incorrectPercent',
+        header: 'Incorrect %',
+        cell: (ctx) => `${ctx.getValue()}%`,
+      },
+    ],
+    [],
+  )
 
   const activeRows =
     reportType === 'student'
@@ -229,9 +284,15 @@ export default function AdminReportsPage() {
         ? filteredExams
         : reportType === 'attempt'
           ? filteredAttempts
-          : []
+          : filteredQuestions
   const activeColumns = (
-    reportType === 'student' ? studentColumns : reportType === 'exam' ? examColumns : attemptColumns
+    reportType === 'student'
+      ? studentColumns
+      : reportType === 'exam'
+        ? examColumns
+        : reportType === 'attempt'
+          ? attemptColumns
+          : questionColumns
   ) as ColumnDef<ReportRow>[]
 
   function savePreset(name: string) {
@@ -259,9 +320,15 @@ export default function AdminReportsPage() {
   }
 
   function printReport() {
-    const headers = (reportType === 'student' ? studentColumns : reportType === 'exam' ? examColumns : attemptColumns).map((c) =>
-      typeof c.header === 'string' ? c.header : 'Column',
-    )
+    const headers = (
+      reportType === 'student'
+        ? studentColumns
+        : reportType === 'exam'
+          ? examColumns
+          : reportType === 'attempt'
+            ? attemptColumns
+            : questionColumns
+    ).map((c) => (typeof c.header === 'string' ? c.header : 'Column'))
     const rows =
       reportType === 'student'
         ? filteredStudents
@@ -279,17 +346,31 @@ export default function AdminReportsPage() {
                   `<tr><td>${r.examTitle}</td><td>${r.subject}</td><td>${r.totalAttempts}</td><td>${r.passedStudents}</td><td>${r.failedStudents}</td><td>${r.averageScore}</td><td>${r.passPercentage}%</td><td>${formatDate(r.createdDate)}</td></tr>`,
               )
               .join('')
-          : filteredAttempts
-              .slice(0, 50)
-              .map(
-                (r) =>
-                  `<tr><td>${r.studentName}</td><td>${r.email}</td><td>${r.examName}</td><td>${r.subject}</td><td>${r.score}</td><td>${r.result}</td><td>${r.timeTakenMinutes}</td><td>${formatDate(r.attemptDate)}</td></tr>`,
-              )
-              .join('')
+          : reportType === 'attempt'
+            ? filteredAttempts
+                .slice(0, 50)
+                .map(
+                  (r) =>
+                    `<tr><td>${r.studentName}</td><td>${r.email}</td><td>${r.examName}</td><td>${r.subject}</td><td>${r.score}</td><td>${r.result}</td><td>${r.timeTakenMinutes}</td><td>${formatDate(r.attemptDate)}</td></tr>`,
+                )
+                .join('')
+            : filteredQuestions
+                .slice(0, 50)
+                .map(
+                  (r) =>
+                    `<tr><td>${r.questionId}</td><td>${r.questionText}</td><td>${r.subject}</td><td>${r.topic}</td><td>${r.difficulty}</td><td>${r.timesAttempted}</td><td>${r.correctPercent}%</td><td>${r.incorrectPercent}%</td></tr>`,
+                )
+                .join('')
     const html = `<table><thead><tr>${headers.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`
     printReportHtml({
       title:
-        reportType === 'student' ? 'Student Performance Report' : reportType === 'exam' ? 'Exam Report' : 'Attempt-Level Report',
+        reportType === 'student'
+          ? 'Student Performance Report'
+          : reportType === 'exam'
+            ? 'Exam Report'
+            : reportType === 'attempt'
+              ? 'Attempt-Level Report'
+              : 'Question-Level Analysis',
       subtitle: `Date range: ${filters.fromDate || 'Any'} - ${filters.toDate || 'Any'}`,
       tableHtml: html,
     })
@@ -387,6 +468,13 @@ export default function AdminReportsPage() {
           loading={loading}
           onRowClick={(row) => setSelectedDrillDown(row)}
         />
+      ) : reportType === 'question' ? (
+        <ReportDataTable<QuestionAnalysisRow>
+          columns={questionColumns}
+          rows={filteredQuestions}
+          loading={loading}
+          onRowClick={(row) => setSelectedDrillDown(row)}
+        />
       ) : (
         <section className="rounded-2xl border border-slate-200/80 bg-white p-8 text-sm text-slate-600 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/80 dark:text-slate-300">
           This report tab will be committed in the next step.
@@ -406,6 +494,21 @@ export default function AdminReportsPage() {
             </button>
           </div>
           <pre className="overflow-auto rounded-lg bg-white/70 p-3 text-xs dark:bg-slate-900/60">{JSON.stringify(selectedDrillDown, null, 2)}</pre>
+          {'questionId' in selectedDrillDown ? (
+            <div className="rounded-lg border border-indigo-100 bg-white/80 p-3 dark:border-indigo-900/40 dark:bg-slate-900/50">
+              <p className="mb-2 text-xs font-semibold text-indigo-900 dark:text-indigo-200">Answer Distribution</p>
+              <div className="h-2 overflow-hidden rounded bg-slate-200 dark:bg-slate-700">
+                <div
+                  className="h-full bg-emerald-500"
+                  style={{ width: `${selectedDrillDown.correctPercent}%` }}
+                  title={`Correct ${selectedDrillDown.correctPercent}%`}
+                />
+              </div>
+              <p className="mt-2 text-xs text-slate-600 dark:text-slate-300">
+                Correct: {selectedDrillDown.correctPercent}% | Incorrect: {selectedDrillDown.incorrectPercent}%
+              </p>
+            </div>
+          ) : null}
         </section>
       ) : null}
 
