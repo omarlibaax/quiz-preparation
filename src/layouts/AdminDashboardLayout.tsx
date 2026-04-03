@@ -15,6 +15,7 @@ const mainNav = [
 
 const generalNav = [
   { to: '/admin/questions', label: 'Question Bank', icon: IconBank },
+  { to: '/admin/reports', label: 'Reports', icon: IconReport },
   { to: '/admin/analytics', label: 'Analytics', icon: IconChart },
   { to: '/admin/settings', label: 'Settings', icon: IconGear },
   { to: '/admin/operations', label: 'Operations', icon: IconTool },
@@ -239,6 +240,17 @@ function IconTool({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655-5.653a2.548 2.548 0 0 0-3.586 0L2.5 8.25" />
+    </svg>
+  )
+}
+function IconReport({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M9 17.25h6m-6-4.5h6m-6-4.5h3m6 12.75H6a2.25 2.25 0 0 1-2.25-2.25V5.25A2.25 2.25 0 0 1 6 3h7.5L20.25 9.75v9A2.25 2.25 0 0 1 18 21Z"
+      />
     </svg>
   )
 }

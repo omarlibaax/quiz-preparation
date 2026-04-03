@@ -18,6 +18,7 @@ import AdminUsersPage from './pages/admin/AdminUsersPage'
 import AdminExamsPage from './pages/admin/AdminExamsPage'
 import AdminQuestionsPage from './pages/admin/AdminQuestionsPage'
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage'
+import AdminReportsPage from './pages/admin/AdminReportsPage'
 import AdminSettingsPage from './pages/admin/AdminSettingsPage'
 import AdminOperationsPage from './pages/admin/AdminOperationsPage'
 import AdminOperationsSubjectsPage from './pages/admin/operations/AdminOperationsSubjectsPage'
@@ -45,6 +46,7 @@ export default function App() {
           <Route path="users" element={<AdminUsersPage />} />
           <Route path="exams" element={<AdminExamsPage />} />
           <Route path="questions" element={<AdminQuestionsPage />} />
+          <Route path="reports" element={<AdminReportsPage />} />
           <Route path="analytics" element={<AdminAnalyticsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="operations" element={<AdminOperationsPage />} />
